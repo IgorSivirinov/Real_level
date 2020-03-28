@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:hint="MAIL"
+        android:inputType="textEmailAddress"
          />
     <EditText
         android:id="@+id/registrationUserName"
@@ -33,6 +34,7 @@
 
     <EditText
         android:id="@+id/registrationRepeatPassword"
+        android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:hint="ПОВТОРИТЕ ПАРОЛЬ"
