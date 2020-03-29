@@ -13,9 +13,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.changelevel.API.API;
+import com.example.changelevel.API.Constantes;
 import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
 import com.example.changelevel.User.User;
+import com.example.changelevel.models.DefaultResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
@@ -46,10 +55,28 @@ public class FragmentRegistration extends Fragment {
             @Override
             public void onClick(View v) {
                 if (registrationPassword.getText().toString().equals(registrationRepeatPassword.getText().toString())){
-                  //  server.getUsers().add(registrationMail.toString(), registrationUserName.toString(), registrationPassword.toString());
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    //intent.putExtra();
-                    startActivity(intent);
+                    Retrofit retrofit = new Retrofit.Builder().baseUrl("http://sivirinov.beget.tech/").addConverterFactory(GsonConverterFactory.create()).build();
+                    API service= retrofit.create(API.class);
+                    Call<DefaultResponse> call=service.Register(registrationUserName.getText().toString(),
+                            registrationMail.getText().toString(),
+                            registrationPassword.getText().toString());
+                    call.enqueue(new Callback<DefaultResponse>() {
+                        @Override
+                        public void onResponse(Call<DefaultResponse> call, Response<DefaultResponse> response) {
+                            if(!response.body().isErr())
+                            {
+                                Intent intent = new Intent(getActivity(), MainActivity.class);
+
+                               startActivity(intent);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<DefaultResponse> call, Throwable t) {
+
+                        }
+                    });
+
                 }
 
             }
