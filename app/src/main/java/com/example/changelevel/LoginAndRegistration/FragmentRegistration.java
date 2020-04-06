@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.changelevel.API.API;
+import com.example.changelevel.API.Api;
 import com.example.changelevel.API.Constantes;
 import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
@@ -45,18 +45,18 @@ public class FragmentRegistration extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-         View view = inflater.inflate(R.layout.fragment_registration, container, false);
-         registrationMail = view.findViewById(R.id.registrationMail);
-         registrationUserName = view.findViewById(R.id.registrationUserName);
-         registrationPassword = view.findViewById(R.id.registrationPassword);
-         registrationRepeatPassword = view.findViewById(R.id.registrationRepeatPassword);
+        View view = inflater.inflate(R.layout.fragment_registration, container, false);
+        registrationMail = view.findViewById(R.id.registrationMail);
+        registrationUserName = view.findViewById(R.id.registrationUserName);
+        registrationPassword = view.findViewById(R.id.registrationPassword);
+        registrationRepeatPassword = view.findViewById(R.id.registrationRepeatPassword);
         buttonRegistration = view.findViewById(R.id.buttonRegistration);
         buttonRegistration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (registrationPassword.getText().toString().equals(registrationRepeatPassword.getText().toString())){
-                    Retrofit retrofit = new Retrofit.Builder().baseUrl("http://sivirinov.beget.tech/").addConverterFactory(GsonConverterFactory.create()).build();
-                    API service= retrofit.create(API.class);
+                    Retrofit retrofit=new Retrofit.Builder().baseUrl(Constantes.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+                    Api service= retrofit.create(Api.class);
                     Call<DefaultResponse> call=service.Register(registrationUserName.getText().toString(),
                             registrationMail.getText().toString(),
                             registrationPassword.getText().toString());
@@ -65,9 +65,10 @@ public class FragmentRegistration extends Fragment {
                         public void onResponse(Call<DefaultResponse> call, Response<DefaultResponse> response) {
                             if(!response.body().isErr())
                             {
+                                User user = response.body().getUser();
                                 Intent intent = new Intent(getActivity(), MainActivity.class);
-
-                               startActivity(intent);
+                                intent.putExtra("user", user);
+                                startActivity(intent);
                             }
                         }
 

@@ -18,11 +18,13 @@ import android.widget.ListView;
 import com.example.changelevel.LoginAndRegistration.FragmentRegistration;
 import com.example.changelevel.LoginAndRegistration.LoginAndRegistration;
 import com.example.changelevel.User.User;
+import com.example.changelevel.ui.uiMain.tasks.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    User user;
     private EditText overview, sportXP, mindXP, creativityXP;
     private Button newTask;
     ArrayList<Task> task = new ArrayList<Task>();
@@ -40,5 +42,8 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+        user = (User) getIntent().getSerializableExtra("user");
+        Intent intent = new Intent(MainActivity.this, TasksFragment.class);
+        intent.putExtra("user", user);
     }
 }

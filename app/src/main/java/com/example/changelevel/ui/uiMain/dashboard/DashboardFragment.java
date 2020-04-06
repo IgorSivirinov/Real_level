@@ -1,4 +1,4 @@
-package com.example.changelevel.ui.dashboard;
+package com.example.changelevel.ui.uiMain.dashboard;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

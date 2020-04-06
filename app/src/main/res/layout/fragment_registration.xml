@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:hint="ИМЯ"
-        android:inputType="textPassword"
+        android:inputType="textPersonName"
         />
 
     <EditText

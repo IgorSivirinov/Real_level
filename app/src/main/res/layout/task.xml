@@ -3,56 +3,72 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:tag="task main controler">
 
-
-    <TextView
-        android:id="@+id/overview"
-        android:layout_width="340dp"
-        android:layout_height="50dp"
-        android:text="Обзор"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:gravity="center"
-        android:id="@+id/cell_xp3"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:textColor="#D32F2F"
-        android:text="cell3"
-        app:layout_constraintEnd_toStartOf="@+id/cell_xp2"
-        app:layout_constraintTop_toBottomOf="@+id/overview" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:gravity="center"
-        android:id="@+id/cell_xp2"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:textColor="#039BE5"
-        android:text="cell2"
-        app:layout_constraintEnd_toStartOf="@+id/cell_xp1"
-        app:layout_constraintTop_toBottomOf="@+id/overview" />
+            <TextView
+                android:id="@+id/overview"
+                android:layout_width="292dp"
+                android:layout_height="69dp"
+                android:text="Обзор"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:gravity="center"
-        android:layout_width="wrap_content"
-        android:id="@+id/cell_xp1"
-        android:layout_height="35dp"
-        android:textColor="#6A1B9A"
-        android:text="cell1"
-        app:layout_constraintEnd_toStartOf="@+id/taskAction"
-        app:layout_constraintTop_toBottomOf="@+id/overview" />
+            <TextView
+                android:id="@+id/cell_xp3"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:text="cell3"
+                android:textColor="#D32F2F"
+                app:layout_constraintEnd_toStartOf="@+id/cell_xp2"
+                app:layout_constraintTop_toBottomOf="@+id/overview" />
 
-    <Button
-        android:id="@+id/taskAction"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:text="Взять"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/overview" />
+            <TextView
+                android:id="@+id/cell_xp2"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:text="cell2"
+                android:textColor="#039BE5"
+                app:layout_constraintEnd_toStartOf="@+id/cell_xp1"
+                app:layout_constraintTop_toBottomOf="@+id/overview" />
 
+            <TextView
+                android:id="@+id/cell_xp1"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:text="cell1"
+                android:textColor="#6A1B9A"
+                app:layout_constraintEnd_toStartOf="@+id/taskAction"
+                app:layout_constraintTop_toBottomOf="@+id/overview" />
+
+            <Button
+                android:id="@+id/taskAction"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="Взять"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/overview" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

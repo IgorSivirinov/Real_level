@@ -1,5 +1,6 @@
 package com.example.changelevel.models;
 
+import com.example.changelevel.User.User;
 import com.google.gson.annotations.SerializedName;
 
 public class DefaultResponse
@@ -10,9 +11,13 @@ public class DefaultResponse
     @SerializedName("uid")
     private String uid;
 
-    public DefaultResponse(boolean err, String uid) {
+    @SerializedName("user")
+    private User user;
+
+    public DefaultResponse(boolean err, String uid,User user) {
         this.err = err;
         this.uid = uid;
+        this.user=user;
     }
 
     public boolean isErr() {
@@ -21,5 +26,9 @@ public class DefaultResponse
 
     public String getUid() {
         return uid;
+    }
+
+    public User getUser() {
+        return user;
     }
 }
