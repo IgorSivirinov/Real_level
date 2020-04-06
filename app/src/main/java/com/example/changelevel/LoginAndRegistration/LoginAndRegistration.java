@@ -25,11 +25,13 @@ public class LoginAndRegistration extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
-        fragmentManager=getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-        FragmentLogin fragment=new FragmentLogin();
-        fragmentTransaction.add(R.id.containerLoginAndRegistration,fragment);
-        fragmentTransaction.commit();
+        else {
+            fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            FragmentLogin fragment = new FragmentLogin();
+            fragmentTransaction.add(R.id.containerLoginAndRegistration, fragment);
+            fragmentTransaction.commit();
+        }
     }
 
     public void Change(View view){
