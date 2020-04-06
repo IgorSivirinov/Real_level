@@ -27,6 +27,7 @@ public class SessionManager
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("email",user.getMail());
         editor.putString("name",user.getUserName());
+        editor.apply();
     }
     public User getUser()
     {
