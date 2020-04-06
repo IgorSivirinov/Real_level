@@ -24,7 +24,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    User user;
     private EditText overview, sportXP, mindXP, creativityXP;
     private Button newTask;
     ArrayList<Task> task = new ArrayList<Task>();
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
-        user = (User) getIntent().getSerializableExtra("user");
+        User user = (User) getIntent().getSerializableExtra("user");
         Intent intent = new Intent(MainActivity.this, TasksFragment.class);
         intent.putExtra("user", user);
     }
