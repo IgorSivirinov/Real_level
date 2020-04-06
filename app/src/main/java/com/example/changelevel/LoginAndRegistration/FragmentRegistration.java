@@ -18,6 +18,7 @@ import com.example.changelevel.API.Constantes;
 import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
 import com.example.changelevel.User.User;
+import com.example.changelevel.helper.SessionManager;
 import com.example.changelevel.models.DefaultResponse;
 
 import retrofit2.Call;
@@ -66,6 +67,7 @@ public class FragmentRegistration extends Fragment {
                             if(!response.body().isErr())
                             {
                                 User user = response.body().getUser();
+                                SessionManager.getInstance(getActivity().getApplicationContext()).saveUser(user);
                                 Intent intent = new Intent(getActivity(), MainActivity.class);
                                 intent.putExtra("user", user);
                                 startActivity(intent);
