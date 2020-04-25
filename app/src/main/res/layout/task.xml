@@ -18,57 +18,55 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/overview"
-                android:layout_width="292dp"
-                android:layout_height="69dp"
-                android:text="Обзор"
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="30dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/cell_xp3"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:gravity="center"
-                android:text="cell3"
-                android:textColor="#D32F2F"
-                app:layout_constraintEnd_toStartOf="@+id/cell_xp2"
-                app:layout_constraintTop_toBottomOf="@+id/overview" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/cell_xp2"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:gravity="center"
-                android:text="cell2"
-                android:textColor="#039BE5"
-                app:layout_constraintEnd_toStartOf="@+id/cell_xp1"
-                app:layout_constraintTop_toBottomOf="@+id/overview" />
+                <TextView
+                    android:id="@+id/cell_xp3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="cell3"
+                    android:textColor="#D32F2F" />
 
-            <TextView
-                android:id="@+id/cell_xp1"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:gravity="center"
-                android:text="cell1"
-                android:textColor="#6A1B9A"
-                app:layout_constraintEnd_toStartOf="@+id/taskAction"
-                app:layout_constraintTop_toBottomOf="@+id/overview" />
+                <TextView
+                    android:id="@+id/cell_xp2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="cell2"
+                    android:textColor="#039BE5" />
 
-            <Button
-                android:id="@+id/taskAction"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:text="Взять"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/overview" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/cell_xp1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="cell1"
+                    android:textColor="#6A1B9A" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

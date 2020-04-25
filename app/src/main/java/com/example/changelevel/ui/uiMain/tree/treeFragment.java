@@ -14,20 +14,12 @@ import com.example.changelevel.R;
 
 public class treeFragment extends Fragment {
 
-    private treeViewModel notificationsViewModel;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
-        notificationsViewModel =
-                ViewModelProviders.of(this).get(treeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_tree, container, false);
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+
         return root;
     }
 }

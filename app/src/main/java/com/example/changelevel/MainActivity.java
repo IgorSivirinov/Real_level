@@ -1,33 +1,36 @@
 package com.example.changelevel;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 
-import com.example.changelevel.LoginAndRegistration.FragmentRegistration;
-import com.example.changelevel.LoginAndRegistration.LoginAndRegistration;
 import com.example.changelevel.User.User;
+import com.example.changelevel.models.DataModels.DataModelTask;
 import com.example.changelevel.ui.uiMain.tasks.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText overview, sportXP, mindXP, creativityXP;
-    private Button newTask;
-    ArrayList<Task> task = new ArrayList<Task>();
-    ListView lv;
+
+
+
+    public static final String ACCESS_MESSAGE="ACCESS_MESSAGE";
+    private static  final int REQUEST_ACCESS_TYPE=1;
+
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private static RecyclerView recyclerView;
+    private ArrayList<DataModelTask> Data;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,11 +41,39 @@ public class MainActivity extends AppCompatActivity {
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_tasks, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
+
+//        recyclerView = findViewById(R.id.additional_recycler_view);
+//        recyclerView.setHasFixedSize(true);
+//        recyclerView.setLayoutManager(layoutManager);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        adapter = new CustomAdapterTask(Data);
+//        recyclerView.setAdapter(adapter);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
         User user = (User) getIntent().getSerializableExtra("user");
         Intent intent = new Intent(MainActivity.this, TasksFragment.class);
         intent.putExtra("user", user);
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(requestCode==REQUEST_ACCESS_TYPE){
+            if(resultCode==RESULT_OK){
+                DataModelTask dataModelTask = (DataModelTask) data.getSerializableExtra(ACCESS_MESSAGE);
+                Data.add(dataModelTask);
+                adapter.notifyItemInserted(Data.size()-1);
+            }
+            else
+            {
+
+            }
+        }
+        else{
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

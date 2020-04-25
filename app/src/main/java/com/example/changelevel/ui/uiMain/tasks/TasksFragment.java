@@ -5,113 +5,76 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
-import com.example.changelevel.LoginAndRegistration.FragmentLogin;
-import com.example.changelevel.LoginAndRegistration.FragmentRegistration;
-import com.example.changelevel.MainActivity;
+import com.example.changelevel.PageAdapter;
 import com.example.changelevel.R;
 import com.example.changelevel.User.User;
-import com.example.changelevel.ui.uiTaskList.accomplished.AccomplishedFragment;
-import com.example.changelevel.ui.uiTaskList.active.ActiveFragment;
-import com.example.changelevel.ui.uiTaskList.notActive.NotActiveFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class TasksFragment extends Fragment implements View.OnClickListener {
+import com.example.changelevel.ui.uiMain.tasks.Settings.SettingsActivity;
+import com.google.android.material.tabs.TabLayout;
+
+public class TasksFragment extends Fragment {
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private PagerAdapter pagerAdapter;
+    private ImageButton imageButtonGoToSettingsActivity;
     private TextView name_tasksList, email_tasksList;
-    private TasksViewModel homeViewModel;
-    private FragmentManager fragmentManager;
-    Fragment fragment;
-    private Button A,B,C;
+
+
     public View onCreateView(@NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(TasksViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_tasks, container, false);
-        name_tasksList = root.findViewById(R.id.name_tasksList);
-        email_tasksList = root.findViewById(R.id.email_tasksList);
+        final View root = inflater.inflate(R.layout.fragment_tasks, container, false);
+        email_tasksList = root.findViewById(R.id.name_tasksList);
+        name_tasksList = root.findViewById(R.id.email_tasksList);
+        tabLayout = root.findViewById(R.id.tabLayoutTasks);
+        imageButtonGoToSettingsActivity = root.findViewById(R.id.imageButtonGoToSettingsActivity);
+        viewPager= root.findViewById(R.id.viewPagerTasks);
 
-        A = root.findViewById(R.id.buttonGoToNotActivity);
-        B = root.findViewById(R.id.buttonGoToActivity);
-        C = root.findViewById(R.id.buttonGoToAccomplished);
-
-        fragmentManager= getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-        fragment = new NotActiveFragment();
-        fragmentTransaction.add(R.id.containerTaskList,fragment);
-        fragmentTransaction.commit();
-
-        A.setOnClickListener(new View.OnClickListener() {
+        name_tasksList.setText(((User) getActivity().getIntent().getSerializableExtra("user")).getUserName());//<
+        // Странно, Email и Name меняются местами.(Поменял мистами чтоб хотябы работоло)              РАЗОБРАТЬСЯ!!!!!
+        email_tasksList.setText(((User) getActivity().getIntent().getSerializableExtra("user")).getMail());//<
+        
+        pagerAdapter = new PageAdapter(getFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(pagerAdapter);
+        imageButtonGoToSettingsActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragment = new NotActiveFragment();
-                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.containerTaskList,fragment);
-                fragmentTransaction.commit();
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
             }
         });
-        B.setOnClickListener(new View.OnClickListener() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View v) {
-                fragment = new ActiveFragment();
-                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.containerTaskList,fragment);
-                fragmentTransaction.commit();
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+                if (tab.getPosition() == 0){
+                    pagerAdapter.notifyDataSetChanged();
+                } else if (tab.getPosition() == 1){
+                    pagerAdapter.notifyDataSetChanged();
+                } else if (tab.getPosition() == 2){
+                    pagerAdapter.notifyDataSetChanged();
+                }
             }
-        });
-        C.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragment = new AccomplishedFragment();
-                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.containerTaskList,fragment);
-                fragmentTransaction.commit();
-            }
-        });
 
-
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                name_tasksList.setText(((User) getActivity().getIntent().getSerializableExtra("user")).getUserName());
-                email_tasksList.setText(((User) getActivity().getIntent().getSerializableExtra("user")).getMail());
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
             }
         });
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
         return root;
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-
-            case R.id.buttonGoToNotActivity:
-                fragment = new NotActiveFragment();
-
-                break;
-            case R.id.buttonGoToActivity: fragment = new ActiveFragment();
-
-                break;
-            case R.id.buttonGoToAccomplished: fragment = new AccomplishedFragment();
-
-                break;
-        }
-        FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.containerTaskList,fragment);
-        fragmentTransaction.commit();
     }
 }

@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.uiTaskList.notActive.NotActiveFragment">
+    tools:context=".ui.uiMain.tasks.uiTaskList.additional.AdditionalFragment">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:id="@+id/notActive_recycler_view"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:id="@+id/additional_recycler_view"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

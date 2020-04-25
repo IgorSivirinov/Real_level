@@ -1,13 +1,10 @@
 package com.example.changelevel.LoginAndRegistration;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -25,26 +22,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
-public class FragmentLogin extends Fragment {
+public class LoginActivity extends AppCompatActivity {
     private EditText loginMail, loginPassword;
     private Button buttonLogin;
-
-    public FragmentLogin() {
-        // Required empty public constructor
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
-        loginMail = view.findViewById(R.id.loginMail);
-        loginPassword = view.findViewById(R.id.loginPassword);
-        buttonLogin = view.findViewById(R.id.buttonLogin);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        loginMail = findViewById(R.id.loginMail);
+        loginPassword = findViewById(R.id.loginPassword);
+        buttonLogin = findViewById(R.id.buttonLogin);
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,15 +39,15 @@ public class FragmentLogin extends Fragment {
                         .addConverterFactory(GsonConverterFactory.create()).build();
                 Api service = retrofit.create(Api.class);
                 Call<DefaultResponse> call = service.Login(
-                          loginMail.getText().toString()
-                        , loginPassword.getText().toString());
+                        loginMail.getText().toString()      ,
+                        loginPassword.getText().toString());
                 call.enqueue(new Callback<DefaultResponse>() {
                     @Override
                     public void onResponse(Call<DefaultResponse> call, Response<DefaultResponse> response) {
                         if(!response.body().isErr()){
                             User user = response.body().getUser();
-                            SessionManager.getInstance(getActivity().getApplicationContext()).saveUser(user);
-                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                            SessionManager.getInstance(getApplicationContext()).saveUser(user);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("user", user);
                             startActivity(intent);
                         }
@@ -74,6 +61,5 @@ public class FragmentLogin extends Fragment {
 
             }
         });
-        return  view;
     }
 }

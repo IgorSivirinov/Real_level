@@ -1,17 +1,12 @@
 package com.example.changelevel.LoginAndRegistration;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.os.Parcelable;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.changelevel.API.Api;
 import com.example.changelevel.API.Constantes;
@@ -27,31 +22,18 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
-public class FragmentRegistration extends Fragment {
-    private static final int REQUEST=1;
-    public static final String ACCESS_MESSAGE="message";
+public class RegistrationActivity extends AppCompatActivity {
     private Button buttonRegistration;
     private EditText registrationMail, registrationUserName, registrationPassword, registrationRepeatPassword;
-
-    public FragmentRegistration() {
-        // Required empty public constructor
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_registration, container, false);
-        registrationMail = view.findViewById(R.id.registrationMail);
-        registrationUserName = view.findViewById(R.id.registrationUserName);
-        registrationPassword = view.findViewById(R.id.registrationPassword);
-        registrationRepeatPassword = view.findViewById(R.id.registrationRepeatPassword);
-        buttonRegistration = view.findViewById(R.id.buttonRegistration);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_registration);
+        registrationMail = findViewById(R.id.registrationMail);
+        registrationUserName = findViewById(R.id.registrationUserName);
+        registrationPassword = findViewById(R.id.registrationPassword);
+        registrationRepeatPassword = findViewById(R.id.registrationRepeatPassword);
+        buttonRegistration = findViewById(R.id.buttonRegistration);
         buttonRegistration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,8 +49,8 @@ public class FragmentRegistration extends Fragment {
                             if(!response.body().isErr())
                             {
                                 User user = response.body().getUser();
-                                SessionManager.getInstance(getActivity().getApplicationContext()).saveUser(user);
-                                Intent intent = new Intent(getActivity(), MainActivity.class);
+                                SessionManager.getInstance(getApplicationContext()).saveUser(user);
+                                Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
                                 intent.putExtra("user", user);
                                 startActivity(intent);
                             }
@@ -84,7 +66,5 @@ public class FragmentRegistration extends Fragment {
 
             }
         });
-        return view;
     }
-
 }

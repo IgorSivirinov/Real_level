@@ -7,14 +7,48 @@
     android:layout_height="match_parent"
     tools:context=".ui.uiMain.tasks.TasksFragment" >
 
-    <TextView
-        android:id="@+id/textView2"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Тест"
-        android:gravity="center"
+        android:layout_height="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/email_tasksList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Test@mail.com"
+            app:layout_constraintBottom_toTopOf="@+id/name_tasksList"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/name_tasksList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="84dp"
+            android:text="Игорь"
+            android:textColor="@android:color/black"
+            android:textSize="50px"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/imageButtonGoToSettingsActivity"
+            android:src="@mipmap/ic_account_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="28dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <LinearLayout
@@ -26,69 +60,45 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         app:layout_constraintVertical_bias="0.0">
 
-        <TextView
-            android:id="@+id/name_tasksList"
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayoutTasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                app:tabSelectedTextColor="@android:color/white"
+                app:tabTextColor="@android:color/black"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/tabItemTasks1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Допалнительно" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/tabItemTasks2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Спорт" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/tabItemTasks3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Разум" />
+            </com.google.android.material.tabs.TabLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPagerTasks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"/>
-        <TextView
-            android:id="@+id/email_tasksList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"/>
+            android:layout_height="wrap_content">
+
+        </androidx.viewpager.widget.ViewPager>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
 
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
-
-        <Button
-            android:id="@+id/buttonGoToNotActivity"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Все"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/buttonGoToActivity"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Активные"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/buttonGoToAccomplished"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Выполнные"
-            android:textColor="#000000" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/containerTaskList"
-        android:name="com.example.changelevel.ui.uiTaskList.notActive.ActiveFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

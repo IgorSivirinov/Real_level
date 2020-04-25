@@ -1,10 +1,8 @@
 package com.example.changelevel.User;
 
-import com.example.changelevel.Task;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class User implements Serializable {
     @SerializedName("email")
@@ -15,10 +13,10 @@ public class User implements Serializable {
     @SerializedName("name")
     private String userName;
 
-    private ArrayList<Task> tasks = new <Task> ArrayList();
     private int sportLevel=0;
     private int mindLevel=0;
     private int creativityLevel=0;
+
     public User(String mail, String userName, String password){
         this.mail=mail;
         this.userName=userName;
