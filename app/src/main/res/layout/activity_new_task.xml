@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.uiMain.tasks.Settings.listSettings.NewTaskActivity">
+    tools:context=".ui.home.Act.listAct.NewTaskActivity">
     <EditText
         android:id="@+id/newTaskName"
         android:layout_width="match_parent"
@@ -21,28 +21,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <EditText
-            android:id="@+id/newTaskSportXP"
+            android:id="@+id/newTaskXP"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="SportXP"
-            android:layout_weight="1"/>
-        <EditText
-            android:id="@+id/newTaskMindXP"
+            android:layout_weight="1"
+            android:hint="SportXP" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:text="Save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="MindXP"
-            android:layout_weight="1"/>
-        <EditText
-            android:id="@+id/newTaskCreativityXP"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="CreativityXP"
-            android:layout_weight="1"/>
+            android:layout_weight="2"/>
     </LinearLayout>
-    <Button
-        android:id="@+id/saveButton"
-        android:text="Save"
-        android:layout_gravity="center"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"/>
+
 </LinearLayout>

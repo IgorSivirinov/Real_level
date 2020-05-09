@@ -13,7 +13,6 @@ import android.os.Bundle;
 
 import com.example.changelevel.User.User;
 import com.example.changelevel.models.DataModels.DataModelTask;
-import com.example.changelevel.ui.uiMain.tasks.TasksFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -49,12 +48,11 @@ public class MainActivity extends AppCompatActivity {
 //        adapter = new CustomAdapterTask(Data);
 //        recyclerView.setAdapter(adapter);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+//
+//        User user = (User) getIntent().getSerializableExtra("user");
 
-        User user = (User) getIntent().getSerializableExtra("user");
-        Intent intent = new Intent(MainActivity.this, TasksFragment.class);
-        intent.putExtra("user", user);
 
     }
 

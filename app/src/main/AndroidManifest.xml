@@ -18,11 +18,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.uiMain.tasks.Settings.listSettings.NewTaskActivity"></activity>
-        <activity android:name=".ui.uiMain.tasks.Settings.SettingsActivity"></activity>
+        <activity android:name=".ui.home.SettingsActivity" />
+        <activity android:name=".ui.home.Act.listAct.NewTaskActivity" />
+
         <provider
-            android:authorities="com.example.fileProvider"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
@@ -33,15 +34,14 @@
 
         <activity android:name=".LoginAndRegistration.RegistrationActivity" />
         <activity android:name=".LoginAndRegistration.LoginActivity" />
-        <activity android:name=".LoginAndRegistration.LoginAndRegistration">
-
+        <activity android:name=".LoginAndRegistration.LoginAndRegistration" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

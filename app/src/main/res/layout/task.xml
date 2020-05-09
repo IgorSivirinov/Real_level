@@ -22,46 +22,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="30dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <TextView
+                    android:id="@+id/name_task"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Error"
+                    android:textColor="@color/darkGray"
+                    android:textSize="30sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:orientation="horizontal">
+
 
                 <TextView
-                    android:id="@+id/cell_xp3"
+                    android:id="@+id/layout_tasks_xp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="cell3"
-                    android:textColor="#D32F2F" />
-
-                <TextView
-                    android:id="@+id/cell_xp2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="cell2"
-                    android:textColor="#039BE5" />
-
-                <TextView
-                    android:id="@+id/cell_xp1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="cell1"
-                    android:textColor="#6A1B9A" />
+                    android:gravity="right"
+                    android:textSize="20sp"
+                    android:text="+100 XP"
+                    android:textColor="@color/xpColor" />
 
             </LinearLayout>
         </LinearLayout>

@@ -13,26 +13,19 @@ public class DataModelTask implements Serializable
     private int id;
 
     @ColumnInfo(name = "name")
-    private String name = "";
+    private String name = "error";
 
     @ColumnInfo(name = "overview")
-    private String overview = "";
+    private String overview = "error";
 
-    @ColumnInfo(name = "sportXP")
-    private int sportXP=0;
+    @ColumnInfo(name = "xp")
+    private int xp=0;
 
-    @ColumnInfo(name = "mindXP")
-    private int mindXP=0;
 
-    @ColumnInfo(name = "creativityXP")
-    private int creativityXP=0;
-
-    public DataModelTask(String name, String overview, int sportXP, int mindXP, int creativityXP){
+    public DataModelTask(String name, String overview, int xp){
         this.name = name;
         this.overview = overview;
-        this.sportXP = sportXP;
-        this.mindXP = mindXP;
-        this.creativityXP = creativityXP;
+        this.xp = xp;
     }
 
     public int getId() {
@@ -56,24 +49,10 @@ public class DataModelTask implements Serializable
         this.overview = overview;
     }
 
-    public int getSportXP() {
-        return sportXP;
+    public int getXp() {
+        return xp;
     }
-    public void setSportXP(int sportXP) {
-        this.sportXP = sportXP;
-    }
-
-    public int getMindXP() {
-        return mindXP;
-    }
-    public void setMindXP(int mindXP) {
-        this.mindXP = mindXP;
-    }
-
-    public int getCreativityXP() {
-        return creativityXP;
-    }
-    public void setCreativityXP(int creativityXP) {
-        this.creativityXP = creativityXP;
+    public void setXp(int xp) {
+        this.xp = xp;
     }
 }

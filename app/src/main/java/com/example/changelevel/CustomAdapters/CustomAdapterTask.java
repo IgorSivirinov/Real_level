@@ -14,7 +14,6 @@ import com.example.changelevel.models.DataModels.DataModelTask;
 import java.util.ArrayList;
 
 public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.MyViewHolder>{
-
     private ArrayList<DataModelTask> dataSet;
 
     public CustomAdapterTask(ArrayList<DataModelTask> dataSet){
@@ -32,14 +31,12 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         TextView name = holder.name;
-        TextView cell_xp1 = holder.cell_xp1;
-        TextView cell_xp2 = holder.cell_xp2;
-        TextView cell_xp3 = holder.cell_xp3;
+        TextView xp = holder.xp;
+
 
         name.setText(dataSet.get(position).getName());
-        cell_xp1.setText(dataSet.get(position).getCreativityXP());
-        cell_xp2.setText(dataSet.get(position).getMindXP());
-        cell_xp3.setText(dataSet.get(position).getSportXP());
+        xp.setText(dataSet.get(position).getName());
+
     }
 
     @Override
@@ -51,15 +48,13 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     public static class MyViewHolder extends RecyclerView.ViewHolder
     {
         TextView name,
-                cell_xp1,cell_xp2,cell_xp3;
+                xp;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            this.name = itemView.findViewById(R.id.name);
-            this.cell_xp1=itemView.findViewById(R.id.cell_xp1);
-            this.cell_xp2=itemView.findViewById(R.id.cell_xp2);
-            this.cell_xp3=itemView.findViewById(R.id.cell_xp3);
+            this.name = itemView.findViewById(R.id.name_task);
+            this.xp=itemView.findViewById(R.id.layout_tasks_xp);
         }
     }
 }
