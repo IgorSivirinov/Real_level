@@ -13,6 +13,7 @@ import com.example.changelevel.R;
 
 import com.example.changelevel.models.DataModels.DataModelListAct;
 import com.example.changelevel.ui.home.HomeFragment;
+import com.example.changelevel.ui.home.SettingsActivity;
 
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class CustomAdapterListAct extends RecyclerView.Adapter<CustomAdapterList
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_settings, parent, false);
-        view.setOnClickListener(HomeFragment.myOnClickListener);
+        view.setOnClickListener(SettingsActivity.myOnClickListener);
         MyViewHolder myViewHolder = new MyViewHolder(view);
         return myViewHolder;
     }
