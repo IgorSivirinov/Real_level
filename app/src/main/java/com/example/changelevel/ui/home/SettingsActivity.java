@@ -37,7 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        ImageButton imageButton = findViewById(R.id.imageButton_toolbar_back);
+        ImageButton imageButton = findViewById(R.id.imageButton_back_toolbar_activity_settings);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,9 +130,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         private void DialogRestartPassword(){
             Dialog dialog = new Dialog(context);
-//            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//            dialog.setContentView(R.layout.);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.setContentView(R.layout.dialog_restart_password);
+            dialog.show();
         }
 
     }

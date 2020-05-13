@@ -2,15 +2,14 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app2="http://schema3s.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.home.HomeFragment" >
 
-    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schema3s.android.com/apk/res-auto"
-        xmlns:app2="http://schemas.android.com/apk/res-auto"
+    <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/toolbar_home"
@@ -27,20 +26,29 @@
                 android:text="TestName"
                 android:textSize="37sp"
                 android:textColor="@color/darkGray"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app2:layout_constraintBottom_toBottomOf="parent"
+                app2:layout_constraintStart_toStartOf="parent"
+                app2:layout_constraintTop_toTopOf="parent" />
 
-            <ImageButton
-                android:id="@+id/imageButtonGoToSettingsActivity"
+            <com.github.florent37.shapeofview.shapes.CircleView
+                android:id="@+id/circleView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@null"
-                android:src="@mipmap/ic_account_icon"
-                app2:layout_constraintBottom_toBottomOf="parent"
-                app2:layout_constraintEnd_toEndOf="parent"
+                android:layout_gravity="center"
+                android:background="@drawable/ripple_null_background_round"
+                android:elevation="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent">
+
+
+                    <ImageButton
+                        android:id="@+id/ib_icon_user_toolbar_home"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/imagestest" />
+            </com.github.florent37.shapeofview.shapes.CircleView>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 

@@ -8,6 +8,7 @@
     android:orientation="vertical"
     tools:context=".ui.home.SettingsActivity">
 
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_settings"
         android:layout_width="match_parent"
@@ -22,10 +23,10 @@
             android:layout_margin="15dp">
 
             <ImageButton
-                android:id="@+id/imageButton_toolbar_back"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@null"
+                android:id="@+id/imageButton_back_toolbar_activity_settings"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/ripple_null_background_round"
                 android:src="@drawable/ic_back"
                 app2:layout_constraintBottom_toBottomOf="parent"
                 app2:layout_constraintEnd_toEndOf="parent"
@@ -37,22 +38,27 @@
             <Button
                 android:id="@+id/button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:text="Выйти"
-                android:background="@color/lightGray"
+                android:background="@drawable/ripple_null_background"
                 android:textColor="@color/blueMain"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
-
-    <ImageButton
-        android:id="@+id/imageButton"
+    <com.github.florent37.shapeofview.shapes.CircleView
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        />
+        android:elevation="4dp">
 
+        <ImageButton
+            android:id="@+id/icon_user_activity_settings"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/imagestest"/>
+
+    </com.github.florent37.shapeofview.shapes.CircleView>
     <TextView
         android:id="@+id/name_settings"
         android:layout_width="wrap_content"

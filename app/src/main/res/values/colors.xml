@@ -6,7 +6,7 @@
     <color name="blueMain">#2979FF</color>
     <color name="lightGray">#FAFAFA</color>
     <color name="darkGray">#424242</color>
-    <color name="Gray">#E0E0E0</color>
+    <color name="Gray">#BDBDBD</color>
     <color name="xpColor">#0D47A1</color>
     <color name="attention">#FBC02D</color>
 </resources>

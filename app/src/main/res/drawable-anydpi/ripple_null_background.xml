@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+android:color="@color/Gray">
+<item>
+    <selector>
+        <item android:state_enabled="true"
+            android:state_pressed="true"
+            android:id="@+id/mask">
+            <shape android:shape="rectangle">
+                <corners android:radius="10dp"/>
+                <solid android:color="@color/lightGray"/>
+            </shape>
+        </item>
+    </selector>
+</item>
+</ripple>
