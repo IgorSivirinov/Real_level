@@ -1,0 +1,41 @@
+package com.example.changelevel.ui.tasks;
+
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
+import com.example.changelevel.R;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+/**
+ * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
+ * <p>You can show this modal bottom sheet from your activity like this:</p>
+ * <pre>
+ *     filtersTeskListDialogFragment.newInstance(30).show(getSupportFragmentManager(), "dialog");
+ * </pre>
+ */
+public class FiltersTaskListDialogBottomSheetFragment extends BottomSheetDialogFragment {
+    public class BottomSheetFragment extends BottomSheetDialogFragment {
+
+        public BottomSheetFragment() {
+
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
+
+        @Nullable
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.filters_task_list_dialog_bottom_sheet_fragment, container, false);
+        }
+    }
+
+}

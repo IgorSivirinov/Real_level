@@ -19,8 +19,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/imageButton_back_toolbar_activity_settings"
@@ -37,6 +36,7 @@
 
             <Button
                 android:id="@+id/button"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
                 android:text="Выйти"
@@ -55,8 +55,9 @@
         <ImageButton
             android:id="@+id/icon_user_activity_settings"
             android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:background="@drawable/imagestest"/>
+            android:layout_height="100dp"/>
+<!--            android:background="@drawable/imagestest"-->
+
 
     </com.github.florent37.shapeofview.shapes.CircleView>
     <TextView

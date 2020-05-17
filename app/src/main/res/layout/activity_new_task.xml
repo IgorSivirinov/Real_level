@@ -4,8 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app2="http://schema3s.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".ui.home.Act.listAct.NewTaskActivity">
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/imageButton_back_toolbar_activity_new_task"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/ripple_null_background_round"
+                android:src="@drawable/ic_cross"
+                app2:layout_constraintBottom_toBottomOf="parent"
+                app2:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
     <EditText
         android:id="@+id/newTaskName"
         android:layout_width="match_parent"
@@ -25,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="SportXP" />
+            android:hint="XP" />
 
         <Button
             android:id="@+id/saveButton"

@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     xmlns:app2="http://schema3s.android.com/apk/res-auto"
-    tools:context=".ui.home.Act.listAct.NameNewActivity"
-    android:orientation="vertical">
+    tools:context=".ui.tasks.TaskActivity">
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:id="@+id/collapsingToolbarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ImageButton
-                android:id="@+id/imageButton_back_toolbar_activity_settings"
+                android:id="@+id/imageButton_back_toolbar_activity_task"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="@drawable/ripple_null_background_round"
-                android:src="@drawable/ic_cross"
+                android:src="@drawable/ic_back"
                 app2:layout_constraintBottom_toBottomOf="parent"
                 app2:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -33,24 +37,33 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-    <EditText
-        android:id="@+id/et_password_activity_password_new"
+    <TextView
+        android:id="@+id/nameTask_activity_task"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Пароль"
-        android:inputType="textPassword" />
+        android:text="Задание"
+        android:textSize="30sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/collapsingToolbarLayout" />
 
-    <EditText
-        android:id="@+id/et_password_repeat_dialog_give_password"
+    <TextView
+        android:id="@+id/overviewTask_activity_task"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="Повтарите пароль" />
+        android:text="обзор"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/nameTask_activity_task"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Button
-        android:id="@+id/b_activity_password_new"
+        android:id="@+id/b_"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Изменить"
-        android:layout_gravity="right"/>
-</LinearLayout>
+        android:layout_gravity="center"
+        android:layout_marginBottom="48dp"
+        android:text="Выполнино"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

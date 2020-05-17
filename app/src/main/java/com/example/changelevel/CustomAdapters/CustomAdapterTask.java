@@ -8,8 +8,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTask;
+import com.example.changelevel.ui.home.HomeFragment;
+import com.example.changelevel.ui.home.SettingsActivity;
+import com.example.changelevel.ui.tasks.TasksFragment;
 
 import java.util.ArrayList;
 
@@ -24,6 +28,7 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.task, parent, false);
+        view.setOnClickListener(TasksFragment.myOnClickListener);
         MyViewHolder myViewHolder = new MyViewHolder(view);
         return myViewHolder;
     }
@@ -56,5 +61,9 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
             this.name = itemView.findViewById(R.id.name_task);
             this.xp=itemView.findViewById(R.id.layout_tasks_xp);
         }
+    }
+
+    public interface onItemClickListener{
+        void onItemClick();
     }
 }

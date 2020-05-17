@@ -1,5 +1,6 @@
 package com.example.changelevel;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -10,14 +11,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
+import com.example.changelevel.CustomAdapters.CustomAdapterTask;
 import com.example.changelevel.User.User;
 import com.example.changelevel.models.DataModels.DataModelTask;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CustomAdapterTask.onItemClickListener {
 
 
 
@@ -29,29 +35,24 @@ public class MainActivity extends AppCompatActivity {
     private static RecyclerView recyclerView;
     private ArrayList<DataModelTask> Data;
 
+    private ImageButton imageButtonFiltersFragmentHome;
+
+    private BottomSheetBehavior sheetBehaviorFilters;
+    private LinearLayout fragment_filters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_tasks, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
 
-//        recyclerView = findViewById(R.id.additional_recycler_view);
-//        recyclerView.setHasFixedSize(true);
-//        recyclerView.setLayoutManager(layoutManager);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        adapter = new CustomAdapterTask(Data);
-//        recyclerView.setAdapter(adapter);
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
-//
-//        User user = (User) getIntent().getSerializableExtra("user");
 
 
     }
@@ -73,5 +74,10 @@ public class MainActivity extends AppCompatActivity {
         else{
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onItemClick() {
+
     }
 }

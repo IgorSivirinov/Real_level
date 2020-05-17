@@ -1,11 +1,12 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/blueMain</item>
         <item name="colorPrimaryDark">@color/blueMain</item>
         <item name="colorAccent">@color/blueMain</item>
+        <item name="chipIconTint">@color/Gray</item>
     </style>
     <style name="ProgressBar_Home" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progessbar_home_xp</item>
@@ -13,7 +14,7 @@
     </style>
 
     <style name="MyToolbarTheme"
-        parent="@style/ThemeOverlay.AppCompat.Dark">
+        parent="@style/ThemeOverlay.MaterialComponents.Toolbar.Surface">
         <item name="colorControlNormal">#FFFFFF</item>
         <item name="titleTextColor">#FFFFFF</item>
     </style>
