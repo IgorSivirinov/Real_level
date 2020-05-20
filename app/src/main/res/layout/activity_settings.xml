@@ -9,7 +9,7 @@
     tools:context=".ui.home.SettingsActivity">
 
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.CollapsingToolbarLayout
         android:id="@+id/toolbar_settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
     <com.github.florent37.shapeofview.shapes.CircleView
         android:layout_width="100dp"
         android:layout_height="100dp"

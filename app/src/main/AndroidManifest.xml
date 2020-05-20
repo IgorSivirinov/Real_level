@@ -19,7 +19,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.tasks.TaskActivity"></activity>
+        <activity android:name=".LoginAndRegistration.LoginActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+        <activity android:name=".LoginAndRegistration.RegistrationActivity"/>
+        <activity android:name=".MainActivity"/>
+        <activity android:name=".ui.tasks.TaskActivity"/>
         <activity android:name=".ui.home.Act.listAct.GiveCodEmailActivity" />
         <activity android:name=".ui.home.SettingsActivity" />
         <activity android:name=".ui.home.Act.listAct.NewTaskActivity" />
@@ -38,16 +47,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".LoginAndRegistration.RegistrationActivity" />
-        <activity android:name=".LoginAndRegistration.LoginActivity" />
-        <activity android:name=".LoginAndRegistration.LoginAndRegistration" />
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+
     </application>
 
 </manifest>
