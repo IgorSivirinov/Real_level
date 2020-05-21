@@ -95,70 +95,6 @@ public class TasksFragment extends Fragment {
         UpdateTasksList();
     }
 
-
-    private class UpdateTapeTasksThread extends Thread{
-        private DocumentSnapshot lastVisible;
-        private int indexTask = -1;
-        @Override
-        public void run() {
-            swipeRefreshLayout.setRefreshing(true);
-            firestore.collection("tasks").limit(1).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        for (QueryDocumentSnapshot document : queryDocumentSnapshots){
-                            indexTask++;
-                            tasks.add(document.toObject(TaskFS.class));
-                            data.add(new DataModelTask(tasks.get(indexTask).getTaskName(), (int)tasks.get(indexTask).getTaskXP()));
-                        }
-                        lastVisible = queryDocumentSnapshots.getDocuments()
-                                .get(queryDocumentSnapshots.size() -1);
-                        adapter = new CustomAdapterTask(data);
-                        swipeRefreshLayout.setRefreshing(false);
-                        recyclerView.setAdapter(adapter);
-                        Button button = root.findViewById(R.id.addTask_fragment_tasks);
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                progressBar_tasksTape.setVisibility(View.VISIBLE);
-                                try {
-                                    firestore.collection("tasks").startAfter(lastVisible).limit(1).get()
-                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                    for (QueryDocumentSnapshot document : queryDocumentSnapshots){
-                                                        indexTask++;
-                                                        tasks.add(document.toObject(TaskFS.class));
-                                                        data.add(new DataModelTask(tasks.get(indexTask).getTaskName(), (int)tasks.get(indexTask).getTaskXP()));
-                                                    }
-                                                    try {
-                                                        lastVisible = queryDocumentSnapshots.getDocuments()
-                                                                .get(queryDocumentSnapshots.size() -1);
-
-                                                    adapter = new CustomAdapterTask(data);
-                                                    progressBar_tasksTape.setVisibility(View.GONE);
-                                                    recyclerView.setAdapter(adapter);
-                                                    } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                    progressBar_tasksTape.setVisibility(View.GONE);
-                                                    Toast.makeText(getActivity(), "Задания закончились", Toast.LENGTH_LONG).show();
-                                                    }
-                                                }
-                                            });
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    progressBar_tasksTape.setVisibility(View.GONE);
-                                }
-                            }
-
-                        });
-                            }
-                        });
-        }
-    }
-
-
-
     private static class MyOnClickListener implements View.OnClickListener {
         private final Context context;
         RecyclerView.ViewHolder viewHolder;
@@ -176,18 +112,74 @@ public class TasksFragment extends Fragment {
             int selectedItemPosition = recyclerView.getChildPosition(view);
             viewHolder = recyclerView.findViewHolderForPosition(selectedItemPosition);
 
-            DataModelTask dmt = TasksFragment.data.get(selectedItemPosition);
+            TaskFS task = TasksFragment.tasks.get(selectedItemPosition);
             Intent intent = new Intent(context, TaskActivity.class);
-//            intent.putExtra("task",dmt);
+//            intent.putExtra("task", task);
             context.startActivity(intent);
         }
     }
 
+    private DocumentSnapshot lastVisible;
+    private int indexTask;
     public void UpdateTasksList(){
+        indexTask = -1;
         data.clear();
         tasks.clear();
-        UpdateTapeTasksThread updateTapeTasks = new UpdateTapeTasksThread();
-        updateTapeTasks.start();
+        recyclerView.setAdapter(adapter);
+
+        progressBar_tasksTape.setVisibility(View.VISIBLE);
+        firestore.collection("tasks").limit(1).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            indexTask++;
+                            tasks.add(document.toObject(TaskFS.class));
+                            data.add(new DataModelTask(tasks.get(indexTask).getTaskName(), (int) tasks.get(indexTask).getTaskXP()));
+                        }
+                        lastVisible = queryDocumentSnapshots.getDocuments()
+                                .get(queryDocumentSnapshots.size() - 1);
+                        adapter = new CustomAdapterTask(data);
+                        progressBar_tasksTape.setVisibility(View.GONE);
+                        swipeRefreshLayout.setRefreshing(false);
+                        recyclerView.setAdapter(adapter);
+                        Button button = root.findViewById(R.id.addTask_fragment_tasks);
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                progressBar_tasksTape.setVisibility(View.VISIBLE);
+                                try {
+                                    firestore.collection("tasks").startAfter(lastVisible).limit(1).get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                                        indexTask++;
+                                                        tasks.add(document.toObject(TaskFS.class));
+                                                        data.add(new DataModelTask(tasks.get(indexTask).getTaskName(), (int) tasks.get(indexTask).getTaskXP()));
+                                                    }
+                                                    try {
+                                                        lastVisible = queryDocumentSnapshots.getDocuments()
+                                                                .get(queryDocumentSnapshots.size() - 1);
+                                                        adapter = new CustomAdapterTask(data);
+                                                        progressBar_tasksTape.setVisibility(View.GONE);
+                                                        recyclerView.setAdapter(adapter);
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                        progressBar_tasksTape.setVisibility(View.GONE);
+                                                        Toast.makeText(getActivity(), "Задания закончились", Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            });
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    progressBar_tasksTape.setVisibility(View.GONE);
+                                }
+                            }
+
+                        });
+                    }
+                });
     }
 
     public void StartBottomSheetDialog(){
