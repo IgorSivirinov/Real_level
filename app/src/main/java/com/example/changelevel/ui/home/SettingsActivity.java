@@ -50,11 +50,8 @@ import java.util.Date;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
     private ImageButton imageButtonUser;
     private static RecyclerView recyclerView;
-    private static ArrayList<DataModelListAct> data;
     public static View.OnClickListener myOnClickListener;
 
     //keep track of camera capture intent
@@ -89,17 +86,17 @@ public class SettingsActivity extends AppCompatActivity {
         myOnClickListener=new MyOnClickListener(this);
         recyclerView=findViewById(R.id.recycler_view_act);
         recyclerView.setHasFixedSize(true);
-        layoutManager=new GridLayoutManager(this,1);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        data=new ArrayList<DataModelListAct>();
+        ArrayList<DataModelListAct> data = new ArrayList<DataModelListAct>();
         for (int i = 0; i< DataListAct.id.length; i++)
         {
             data.add(new DataModelListAct(DataListAct.id[i],
                     DataListAct.nameArray[i],
                     DataListAct.iconArray[i]));
         }
-        adapter=new CustomAdapterListAct(data);
+        RecyclerView.Adapter adapter = new CustomAdapterListAct(data);
         recyclerView.setAdapter(adapter);
     }
 
@@ -134,7 +131,7 @@ public class SettingsActivity extends AppCompatActivity {
                     intent = new Intent(context, PasswordNewActivity.class);
                     break;
                 case 3:
-                    DialogGivePassword();
+                    intent = new Intent(context, NewTaskActivity.class);
                     break;
             }
 
@@ -154,20 +151,7 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) { DialogRestartPassword(); }});
             Button ok = dialog.findViewById(R.id.b_ok_dialog_give_password);
-            ok.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(password.getText().toString().equals("1234")) {
-                        switch (viewHolder.getAdapterPosition()) {
-                            case 4:
-                                intent = new Intent(context, NewTaskActivity.class);
-                                break;
-                        }
-                        context.startActivity(intent);
-                    }
-                }
-            });
-            dialog.show();
+
         }
 
         private void DialogRestartPassword(){

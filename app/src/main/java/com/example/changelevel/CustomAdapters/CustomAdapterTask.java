@@ -18,6 +18,7 @@ import com.example.changelevel.ui.tasks.TasksFragment;
 import java.util.ArrayList;
 
 public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.MyViewHolder>{
+
     private ArrayList<DataModelTask> dataSet;
 
     public CustomAdapterTask(ArrayList<DataModelTask> dataSet){
@@ -27,6 +28,7 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.task, parent, false);
         view.setOnClickListener(TasksFragment.myOnClickListener);
         MyViewHolder myViewHolder = new MyViewHolder(view);
@@ -38,9 +40,8 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
         TextView name = holder.name;
         TextView xp = holder.xp;
 
-
         name.setText(dataSet.get(position).getName());
-        xp.setText(dataSet.get(position).getName());
+        xp.setText("+ "+(dataSet.get(position).getXp())+"XP");
 
     }
 
@@ -50,20 +51,16 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     }
 
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder
+    static class MyViewHolder extends RecyclerView.ViewHolder
     {
         TextView name,
                 xp;
 
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
-
             this.name = itemView.findViewById(R.id.name_task);
-            this.xp=itemView.findViewById(R.id.layout_tasks_xp);
+            this.xp = itemView.findViewById(R.id.layout_tasks_xp);
         }
     }
 
-    public interface onItemClickListener{
-        void onItemClick();
-    }
 }

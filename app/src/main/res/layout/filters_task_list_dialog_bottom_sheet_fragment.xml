@@ -86,10 +86,4 @@
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
-    <Button
-        android:id="@+id/b_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="test"/>
-
 </LinearLayout>

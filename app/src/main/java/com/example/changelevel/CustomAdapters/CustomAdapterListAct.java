@@ -32,8 +32,7 @@ public class CustomAdapterListAct extends RecyclerView.Adapter<CustomAdapterList
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_settings, parent, false);
         view.setOnClickListener(SettingsActivity.myOnClickListener);
-        MyViewHolder myViewHolder = new MyViewHolder(view);
-        return myViewHolder;
+        return new MyViewHolder(view);
     }
 
     @Override
@@ -50,7 +49,7 @@ public class CustomAdapterListAct extends RecyclerView.Adapter<CustomAdapterList
         return dataSet.size();
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView name;
         ImageView image;
 

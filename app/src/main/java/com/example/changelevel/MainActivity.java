@@ -23,22 +23,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements CustomAdapterTask.onItemClickListener {
+public class MainActivity extends AppCompatActivity{
 
 
 
-    public static final String ACCESS_MESSAGE="ACCESS_MESSAGE";
-    private static  final int REQUEST_ACCESS_TYPE=1;
-
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
-    private static RecyclerView recyclerView;
-    private ArrayList<DataModelTask> Data;
-
-    private ImageButton imageButtonFiltersFragmentHome;
-
-    private BottomSheetBehavior sheetBehaviorFilters;
-    private LinearLayout fragment_filters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,30 +42,6 @@ public class MainActivity extends AppCompatActivity implements CustomAdapterTask
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
 
-
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode==REQUEST_ACCESS_TYPE){
-            if(resultCode==RESULT_OK){
-                DataModelTask dataModelTask = (DataModelTask) data.getSerializableExtra(ACCESS_MESSAGE);
-                Data.add(dataModelTask);
-                adapter.notifyItemInserted(Data.size()-1);
-            }
-            else
-            {
-
-            }
-        }
-        else{
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
-    public void onItemClick() {
 
     }
 }
