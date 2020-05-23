@@ -3,6 +3,7 @@ package com.example.changelevel.CustomAdapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,9 +40,14 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         TextView name = holder.name;
         TextView xp = holder.xp;
+        ImageView completed = holder.completed;
 
         name.setText(dataSet.get(position).getName());
-        xp.setText("+ "+(dataSet.get(position).getXp())+"XP");
+        xp.setText("+"+(dataSet.get(position).getXp())+" XP");
+        if (dataSet.get(position).isCompleted()){
+            completed.setVisibility(View.VISIBLE);
+            xp.setVisibility(View.GONE);
+        }
 
     }
 
@@ -55,11 +61,13 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     {
         TextView name,
                 xp;
+        ImageView completed;
 
         MyViewHolder(@NonNull View itemView) {
             super(itemView);
             this.name = itemView.findViewById(R.id.name_task);
             this.xp = itemView.findViewById(R.id.layout_tasks_xp);
+            this.completed = itemView.findViewById(R.id.iv_taskComplete_task);
         }
     }
 

@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/ripple_null_background"
     android:tag="task main controler">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
+        android:background="@drawable/ripple_null_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="#FFFFFF"
@@ -18,7 +18,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/iconTaskType_task"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/ic_account_icon"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,31 +43,49 @@
                     android:id="@+id/name_task"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Error"
+                    android:text="Name"
                     android:layout_margin="10dp"
                     android:textColor="@color/darkGray"
-                    android:textSize="30sp"
+                    android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </LinearLayout>
+
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:orientation="horizontal">
+                android:layout_margin="10dp">
 
-
+                <TextView
+                    android:id="@+id/tv_taskType_task"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TaskType"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right">
+                <ImageView
+                    android:id="@+id/iv_taskComplete_task"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_task_completed"/>
                 <TextView
                     android:id="@+id/layout_tasks_xp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="right"
                     android:textSize="20sp"
                     android:text="+100 XP"
                     android:textColor="@color/xpColor" />
+                </LinearLayout>
 
             </LinearLayout>
+        </LinearLayout>
         </LinearLayout>
 
 

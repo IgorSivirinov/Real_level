@@ -34,7 +34,7 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/b_signOut_activity_settings"
                 style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
                 android:layout_width="wrap_content" android:layout_height="60dp"
                 android:text="Выйти"

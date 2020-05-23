@@ -1,41 +1,21 @@
 package com.example.changelevel.API.Firebase.Firestor;
 
-public class TaskFS {
+public class TaskFS{
     private String taskName;
     private String taskOverview;
-    private TaskType taskType;
+    private String taskType;
     private long taskXP;
+    private long minLevel;
 
-    public static class TaskType{
-        private String name;
-        private long minRank;
+    public TaskFS() {}
 
-        TaskType(){}
-
-        public TaskType(String name, long minRank) {
-            this.name = name;
-            this.minRank = minRank;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public long getMinRank() {
-            return minRank;
-        }
-
-    }
-
-    public TaskFS(){}
-
-    public TaskFS(String taskName, String taskOverview, TaskType taskType, long taskXP) {
+    public TaskFS(String taskName, String taskOverview, String taskType, long taskXP, long minLevel) {
         this.taskName = taskName;
         this.taskOverview = taskOverview;
         this.taskType = taskType;
         this.taskXP = taskXP;
+        this.minLevel = minLevel;
     }
-
 
     public String getTaskName() {
         return taskName;
@@ -45,8 +25,7 @@ public class TaskFS {
         return taskOverview;
     }
 
-
-    public TaskType getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
@@ -54,4 +33,7 @@ public class TaskFS {
         return taskXP;
     }
 
+    public long getMinLevel() {
+        return minLevel;
+    }
 }

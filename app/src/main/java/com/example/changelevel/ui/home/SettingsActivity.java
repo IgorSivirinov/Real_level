@@ -33,6 +33,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.changelevel.CustomAdapters.CustomAdapterListAct;
+import com.example.changelevel.LoginAndRegistration.LoginActivity;
 import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelListAct;
@@ -41,6 +42,7 @@ import com.example.changelevel.ui.home.Act.listAct.EmailNewActivity;
 import com.example.changelevel.ui.home.Act.listAct.NameNewActivity;
 import com.example.changelevel.ui.home.Act.listAct.NewTaskActivity;
 import com.example.changelevel.ui.home.Act.listAct.PasswordNewActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +53,7 @@ import java.util.Date;
 public class SettingsActivity extends AppCompatActivity {
 
     private ImageButton imageButtonUser;
+    private Button signOutButton;
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
 
@@ -80,7 +83,7 @@ public class SettingsActivity extends AppCompatActivity {
         imageButtonUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogNewIconUser();
+                dialogNewIconUser();
             }
         });
         myOnClickListener=new MyOnClickListener(this);
@@ -98,6 +101,20 @@ public class SettingsActivity extends AppCompatActivity {
         }
         RecyclerView.Adapter adapter = new CustomAdapterListAct(data);
         recyclerView.setAdapter(adapter);
+        signOutButton = findViewById(R.id.b_signOut_activity_settings);
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+                Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void signOut() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
     }
 
     private static class MyOnClickListener implements View.OnClickListener {
@@ -139,7 +156,7 @@ public class SettingsActivity extends AppCompatActivity {
                 context.startActivity(intent);
         }
 
-        private void DialogGivePassword(){
+        private void dialogGivePassword(){
             Dialog dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -149,12 +166,12 @@ public class SettingsActivity extends AppCompatActivity {
             Button restartPassword = dialog.findViewById(R.id.b_forgot_password_dialog_give_password);
             restartPassword.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) { DialogRestartPassword(); }});
+                public void onClick(View v) { dialogRestartPassword(); }});
             Button ok = dialog.findViewById(R.id.b_ok_dialog_give_password);
 
         }
 
-        private void DialogRestartPassword(){
+        private void dialogRestartPassword(){
             Dialog dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -164,7 +181,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    private  void DialogNewIconUser(){
+    private  void dialogNewIconUser(){
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

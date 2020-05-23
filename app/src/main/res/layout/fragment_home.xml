@@ -20,15 +20,16 @@
             android:layout_margin="15dp">
 
             <TextView
-                android:id="@+id/name_toolbar_home"
+                android:id="@+id/tv_name_toolbar_fragment_home"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TestName"
-                android:textSize="37sp"
                 android:textColor="@color/darkGray"
+                android:textSize="37sp"
                 app2:layout_constraintBottom_toBottomOf="parent"
                 app2:layout_constraintStart_toStartOf="parent"
-                app2:layout_constraintTop_toTopOf="parent" />
+                app2:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
             <com.github.florent37.shapeofview.shapes.CircleView
                 android:id="@+id/circleView"
@@ -72,17 +73,17 @@
                 android:layout_marginTop="10dp">
 
                     <TextView
-                        android:id="@+id/level_home"
+                        android:id="@+id/tv_level_fragment_home"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="LEVEL -"
-                        android:textColor="#1DE9B6"
+                        android:textColor="@color/teal"
                         android:textSize="30sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
                     <TextView
-                        android:id="@+id/xp_home"
+                        android:id="@+id/tv_xp_fragment_home"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
@@ -94,7 +95,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ProgressBar
-                android:id="@+id/progress_bar_home"
+                android:id="@+id/pb_xp_fragment_home"
                 style="@style/ProgressBar_Home"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -2,20 +2,17 @@ package com.example.changelevel.ui.tasks;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -23,27 +20,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
+import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskFS;
 import com.example.changelevel.CustomAdapters.CustomAdapterTask;
-import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
-import com.example.changelevel.models.DataModels.DataModelListAct;
 import com.example.changelevel.models.DataModels.DataModelTask;
-import com.example.changelevel.ui.home.Act.DataListAct;
-import com.example.changelevel.ui.home.Act.listAct.NewTaskActivity;
-import com.example.changelevel.ui.home.SettingsActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
-
-import static com.example.changelevel.ui.tasks.DataListTest.nameArray;
-import static com.example.changelevel.ui.tasks.DataListTest.xp;
 
 public class TasksFragment extends Fragment {
 
@@ -51,12 +44,18 @@ public class TasksFragment extends Fragment {
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
     private static ArrayList<DataModelTask> data;
-    private static ArrayList<TaskFS> tasks;
+    private static TaskFS task;
     private SwipeRefreshLayout swipeRefreshLayout;
     private View root;
     private ProgressBar progressBar_tasksTape;
 
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+    private String taskSortFilter = "taskXP";
+    private Query.Direction taskSortType = Query.Direction.DESCENDING;
+
+    private Gson gson = new Gson();
+    private User user;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
@@ -69,7 +68,6 @@ public class TasksFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         data = new ArrayList<DataModelTask>();
-        tasks = new ArrayList<TaskFS>();
 
         progressBar_tasksTape = root.findViewById(R.id.pb_tasksTape_fragment_tasks);
 
@@ -86,18 +84,24 @@ public class TasksFragment extends Fragment {
             }
         });
 
+
+
         return root;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        SharedPreferences sharedPreferences = getContext()
+                .getSharedPreferences(user.APP_PREFERENCES_USER, getContext().MODE_PRIVATE);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
         UpdateTasksList();
+
     }
 
-    private static class MyOnClickListener implements View.OnClickListener {
+
+    private class MyOnClickListener implements View.OnClickListener {
         private final Context context;
-        RecyclerView.ViewHolder viewHolder;
 
         private MyOnClickListener(Context context) {
             this.context = context;
@@ -110,32 +114,36 @@ public class TasksFragment extends Fragment {
 
         private void removeItem(View view) {
             int selectedItemPosition = recyclerView.getChildPosition(view);
-            viewHolder = recyclerView.findViewHolderForPosition(selectedItemPosition);
-
-            TaskFS task = TasksFragment.tasks.get(selectedItemPosition);
+            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForPosition(selectedItemPosition);
+            DataModelTask task = TasksFragment.data.get(selectedItemPosition);
             Intent intent = new Intent(context, TaskActivity.class);
-//            intent.putExtra("task", task);
+
+            intent.putExtra("task", gson.toJson(task));
             context.startActivity(intent);
+
         }
     }
 
     private DocumentSnapshot lastVisible;
-    private int indexTask;
-    public void UpdateTasksList(){
-        indexTask = -1;
+    private void UpdateTasksList(){
         data.clear();
-        tasks.clear();
         recyclerView.setAdapter(adapter);
 
         progressBar_tasksTape.setVisibility(View.VISIBLE);
-        firestore.collection("tasks").limit(1).get()
+
+        firestore.collection("tasks").orderBy(taskSortFilter, taskSortType).limit(1).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            indexTask++;
-                            tasks.add(document.toObject(TaskFS.class));
-                            data.add(new DataModelTask(tasks.get(indexTask).getTaskName(), (int) tasks.get(indexTask).getTaskXP()));
+                            task = document.toObject(TaskFS.class);
+                            if (user.checkLevel() >= task.getMinLevel())
+                            data.add(new DataModelTask(document.getId(),
+                                    task.getTaskName(),
+                                    task.getTaskOverview(),
+                                    task.getTaskType(),
+                                    (int)task.getTaskXP()
+                                    ,CheckTaskCompleted(document.getId())));
                         }
                         lastVisible = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.size() - 1);
@@ -149,14 +157,20 @@ public class TasksFragment extends Fragment {
                             public void onClick(View v) {
                                 progressBar_tasksTape.setVisibility(View.VISIBLE);
                                 try {
-                                    firestore.collection("tasks").startAfter(lastVisible).limit(1).get()
+                                    firestore.collection("tasks").orderBy(taskSortFilter, taskSortType).startAfter(lastVisible).limit(1).get()
                                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                                        indexTask++;
-                                                        tasks.add(document.toObject(TaskFS.class));
-                                                        data.add(new DataModelTask(tasks.get(indexTask).getTaskName(), (int) tasks.get(indexTask).getTaskXP()));
+                                                        task = document.toObject(TaskFS.class);
+                                                        if (user.checkLevel() >= task.getMinLevel())
+                                                        data.add(new DataModelTask(document.getId(),
+                                                                task.getTaskName(),
+                                                                task.getTaskOverview(),
+                                                                task.getTaskType(),
+                                                                (int)task.getTaskXP()
+                                                                ,CheckTaskCompleted(document.getId())));
+                                                        document.getReference();
                                                     }
                                                     try {
                                                         lastVisible = queryDocumentSnapshots.getDocuments()
@@ -180,6 +194,13 @@ public class TasksFragment extends Fragment {
                         });
                     }
                 });
+    }
+
+    private boolean CheckTaskCompleted(String idTask){
+        for (int i = 0; i<user.getTasksCompleted().size(); i++){
+            if (user.getTasksCompleted().get(i).equals(idTask)) return true;
+        }
+        return false;
     }
 
     public void StartBottomSheetDialog(){
