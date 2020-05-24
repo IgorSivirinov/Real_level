@@ -39,11 +39,12 @@ public class StartActivity extends AppCompatActivity {
 
         if(currentUser!=null){
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-            firestore.collection("users").document(currentUser.getEmail()).get()
+            firestore.collection("users").document(currentUser.getUid()).get()
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            User user = new User(currentUser.getEmail(), documentSnapshot.toObject(UserFS.class));
+                            User user = new User(currentUser.getUid(), currentUser.getEmail(),
+                                    documentSnapshot.toObject(UserFS.class));
                             intent = new Intent(StartActivity.this, MainActivity.class);
                             Gson gson = new Gson();
                             SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);

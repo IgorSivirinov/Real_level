@@ -22,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskFS;
+import com.example.changelevel.API.Firebase.Firestor.TaskTypeFS;
 import com.example.changelevel.CustomAdapters.CustomAdapterTask;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTask;
@@ -29,6 +30,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -44,6 +47,7 @@ public class TasksFragment extends Fragment {
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
     private static ArrayList<DataModelTask> data;
+    private ImageButton imageButtonFiltersFragmentHome;
     private static TaskFS task;
     private SwipeRefreshLayout swipeRefreshLayout;
     private View root;
@@ -51,7 +55,8 @@ public class TasksFragment extends Fragment {
 
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-    private String taskSortFilter = "taskXP";
+    private Query taskSort;
+    private String taskSortFilter = "minLevel";
     private Query.Direction taskSortType = Query.Direction.DESCENDING;
 
     private Gson gson = new Gson();
@@ -60,23 +65,13 @@ public class TasksFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_tasks, container, false);
+        init();
 
-        myOnClickListener=new MyOnClickListener(getActivity());
-        recyclerView = root.findViewById(R.id.tasks_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        data = new ArrayList<DataModelTask>();
 
-        progressBar_tasksTape = root.findViewById(R.id.pb_tasksTape_fragment_tasks);
-
-        ImageButton imageButtonFiltersFragmentHome = root.findViewById(R.id.imageButton_filters_fragment_home);
         imageButtonFiltersFragmentHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { StartBottomSheetDialog(); }});
 
-        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout_fragment_tasks);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -89,12 +84,27 @@ public class TasksFragment extends Fragment {
         return root;
     }
 
+    private void init(){
+        myOnClickListener=new MyOnClickListener(getActivity());
+        recyclerView = root.findViewById(R.id.tasks_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        data = new ArrayList<DataModelTask>();
+        progressBar_tasksTape = root.findViewById(R.id.pb_tasksTape_fragment_tasks);
+        imageButtonFiltersFragmentHome = root.findViewById(R.id.imageButton_filters_fragment_home);
+        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout_fragment_tasks);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         SharedPreferences sharedPreferences = getContext()
                 .getSharedPreferences(user.APP_PREFERENCES_USER, getContext().MODE_PRIVATE);
         user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+        taskSort = firestore.collection("tasks").whereLessThanOrEqualTo("minLevel", user.checkLevel())
+                .orderBy(taskSortFilter, taskSortType);
         UpdateTasksList();
 
     }
@@ -131,14 +141,13 @@ public class TasksFragment extends Fragment {
 
         progressBar_tasksTape.setVisibility(View.VISIBLE);
 
-        firestore.collection("tasks").orderBy(taskSortFilter, taskSortType).limit(1).get()
+        taskSort.limit(3).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             task = document.toObject(TaskFS.class);
-                            if (user.checkLevel() >= task.getMinLevel())
-                            data.add(new DataModelTask(document.getId(),
+                                                        data.add(new DataModelTask(document.getId(),
                                     task.getTaskName(),
                                     task.getTaskOverview(),
                                     task.getTaskType(),
@@ -157,13 +166,13 @@ public class TasksFragment extends Fragment {
                             public void onClick(View v) {
                                 progressBar_tasksTape.setVisibility(View.VISIBLE);
                                 try {
-                                    firestore.collection("tasks").orderBy(taskSortFilter, taskSortType).startAfter(lastVisible).limit(1).get()
+                                    taskSort.startAfter(lastVisible)
+                                            .limit(3).get()
                                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                                         task = document.toObject(TaskFS.class);
-                                                        if (user.checkLevel() >= task.getMinLevel())
                                                         data.add(new DataModelTask(document.getId(),
                                                                 task.getTaskName(),
                                                                 task.getTaskOverview(),
@@ -203,11 +212,51 @@ public class TasksFragment extends Fragment {
         return false;
     }
 
+
+
+    private Chip chip;
+    private ArrayList<Chip> chips = new ArrayList<Chip>();
+    private ChipGroup chipGroup;
+    private ProgressBar progressLoading;
+
     public void StartBottomSheetDialog(){
         View view = getLayoutInflater().inflate(R.layout.filters_task_list_dialog_bottom_sheet_fragment, null);
+        progressLoading = view.findViewById(R.id.pb_loading_bottom_sheet_filters);
+        chipGroup = view.findViewById(R.id.cg_taskType_bottom_sheet_filters);
         BottomSheetDialog dialog = new BottomSheetDialog(getContext());
         dialog.setContentView(view);
         dialog.show();
+        updateChips();
+        chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(ChipGroup group, int checkedId) {
+                Toast.makeText(getContext(), chips.get(checkedId).getText().toString(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
+    private void updateChips(){
+        firestore.collection("taskTypes")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                chip = (Chip) getLayoutInflater().inflate(R.layout.chip_task_type,
+                                        null, false);
+                                chip.setText(document.toObject(TaskTypeFS.class).getNameType());
+                                chips.add(chip);
+                                chipGroup.addView(chip);
+                            }
+                            stopLoading();
+                        }
+                    }
+                });
+    }
+
+    private void stopLoading(){
+        progressLoading.setVisibility(View.GONE);
+        chipGroup.setVisibility(View.VISIBLE);
+    }
 }

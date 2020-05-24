@@ -44,6 +44,26 @@ public class UserFS {
         return tasksCompleted;
     }
 
+    public void setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setXp(long xp) {
+        this.xp = xp;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    public void setTasksCompleted(ArrayList<String> tasksCompleted) {
+        this.tasksCompleted = tasksCompleted;
+    }
+
     public int checkLevel(){
         if (this.xp<=20) return 0;
         if (this.xp<=100) return 1;

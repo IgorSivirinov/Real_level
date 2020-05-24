@@ -24,6 +24,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
@@ -36,6 +37,8 @@ public class RegistrationActivity extends AppCompatActivity {
     private TextInputLayout name, email, password, rePassword;
     private ProgressBar progressBar;
     private boolean checkPasswords, checkEmptyString;
+
+    FirebaseUser firebaseUser;
 
     private String sName;
     private String sEmail;
@@ -83,16 +86,23 @@ public class RegistrationActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
+
+                                        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                .setDisplayName(sName)
+                                                .build();
+                                        firebaseUser.updateProfile(profileUpdates);
                                         rePassword.setError(null);
+
                                         final UserFS userFS = new UserFS(
                                                 null,
                                                 sName, 0, false,
                                                 new ArrayList<String>());
-                                        firestore.collection("users").document(sEmail).set(userFS)
+                                        firestore.collection("users").document(firebaseUser.getUid()).set(userFS)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        User user = new User(sEmail, userFS);
+                                                        User user = new User(firebaseUser.getUid(),sEmail, userFS);
                                                         Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
                                                         Gson gson = new Gson();
                                                         SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
