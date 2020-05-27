@@ -1,8 +1,5 @@
 package com.example.changelevel.ui.tasks;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -12,12 +9,15 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskCompletedTapeFS;
-import com.example.changelevel.API.Firebase.Firestor.UserTasksCompletedFS;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTask;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -31,6 +31,7 @@ public class TaskActivity extends AppCompatActivity {
     private Button bCompleted, bDelete;
     private ImageButton ibBack;
     private TextView name, overview;
+    private ImageView ivTaskComplete;
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private User user;
     private DataModelTask task;
@@ -45,6 +46,11 @@ public class TaskActivity extends AppCompatActivity {
         overview.setText(task.getOverview());
 
         if (user.isAdmin()) bDelete.setVisibility(View.VISIBLE);
+
+        if (task.isCompleted()){
+            bCompleted.setVisibility(View.GONE);
+            ivTaskComplete.setVisibility(View.VISIBLE);
+        }
 
         ibBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +98,7 @@ public class TaskActivity extends AppCompatActivity {
 
         name = findViewById(R.id.nameTask_activity_task);
         overview = findViewById(R.id.overviewTask_activity_task);
+        ivTaskComplete = findViewById(R.id.iv_taskComplete_activity_task);
 
         ibBack = findViewById(R.id.ib_back_toolbar_activity_task);
         bCompleted = findViewById(R.id.b_task_completed_activity_task);
@@ -119,6 +126,7 @@ public class TaskActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
+                                
                                 finish();
                             }
                         })
@@ -128,8 +136,6 @@ public class TaskActivity extends AppCompatActivity {
                                 Toast.makeText(TaskActivity.this, "Ошибка удаления", Toast.LENGTH_SHORT).show();
                             }
                         });
-
-
             }
         });
         dialog.show();

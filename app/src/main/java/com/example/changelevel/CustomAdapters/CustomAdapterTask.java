@@ -7,18 +7,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTask;
-import com.example.changelevel.ui.home.HomeFragment;
-import com.example.changelevel.ui.home.SettingsActivity;
 import com.example.changelevel.ui.tasks.TasksFragment;
 
 import java.util.ArrayList;
 
 public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.MyViewHolder>{
+
+
 
     private ArrayList<DataModelTask> dataSet;
 
@@ -40,16 +40,26 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         TextView name = holder.name;
         TextView xp = holder.xp;
+        TextView type = holder.type;
+        TextView minLevel = holder.minLevel;
         ImageView completed = holder.completed;
+        CardView blocked = holder.blocked;
 
         name.setText(dataSet.get(position).getName());
         xp.setText("+"+(dataSet.get(position).getXp())+" XP");
+        type.setText(dataSet.get(position).getType());
+        minLevel.setText("Доступен с "+dataSet.get(position).getMinLevel()+" уровня");
+        if (!dataSet.get(position).isBlocked()){
+            blocked.setVisibility(View.GONE);
+        }
         if (dataSet.get(position).isCompleted()){
             completed.setVisibility(View.VISIBLE);
             xp.setVisibility(View.GONE);
         }
 
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -59,15 +69,18 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
 
     static class MyViewHolder extends RecyclerView.ViewHolder
     {
-        TextView name,
-                xp;
+        TextView name, xp, type, minLevel;
         ImageView completed;
+        CardView blocked;
 
         MyViewHolder(@NonNull View itemView) {
             super(itemView);
             this.name = itemView.findViewById(R.id.name_task);
             this.xp = itemView.findViewById(R.id.layout_tasks_xp);
             this.completed = itemView.findViewById(R.id.iv_taskComplete_task);
+            this.type = itemView.findViewById(R.id.tv_taskType_task);
+            this.blocked = itemView.findViewById(R.id.cv_blocked_task);
+            this.minLevel = itemView.findViewById(R.id.tv_minLevel_task);
         }
     }
 

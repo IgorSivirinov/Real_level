@@ -10,11 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.changelevel.R;
-
 import com.example.changelevel.models.DataModels.DataModelListAct;
-import com.example.changelevel.ui.home.HomeFragment;
 import com.example.changelevel.ui.home.SettingsActivity;
-
 
 import java.util.ArrayList;
 

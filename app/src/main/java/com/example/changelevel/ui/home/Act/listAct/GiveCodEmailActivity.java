@@ -1,7 +1,8 @@
 package com.example.changelevel.ui.home.Act.listAct;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.changelevel.R;
 

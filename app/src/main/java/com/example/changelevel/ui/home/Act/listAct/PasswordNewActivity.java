@@ -1,7 +1,6 @@
 package com.example.changelevel.ui.home.Act.listAct;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -12,9 +11,7 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
-import com.example.changelevel.ui.home.SettingsActivity;
 
 public class PasswordNewActivity extends AppCompatActivity {
     Button button;

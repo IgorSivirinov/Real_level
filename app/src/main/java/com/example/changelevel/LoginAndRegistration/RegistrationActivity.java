@@ -1,20 +1,18 @@
 package com.example.changelevel.LoginAndRegistration;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.UserFS;
-import com.example.changelevel.API.Firebase.Firestor.UserTasksCompletedFS;
 import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,7 +27,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class RegistrationActivity extends AppCompatActivity {
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -96,7 +93,9 @@ public class RegistrationActivity extends AppCompatActivity {
 
                                         final UserFS userFS = new UserFS(
                                                 null,
-                                                sName, 0, false,
+                                                sName, 0,
+                                                false, false,
+                                                new ArrayList<String>(),
                                                 new ArrayList<String>());
                                         firestore.collection("users").document(firebaseUser.getUid()).set(userFS)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {

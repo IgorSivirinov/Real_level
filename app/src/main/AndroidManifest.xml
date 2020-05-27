@@ -30,9 +30,11 @@
         </activity>
 
         <activity android:name=".ui.tasks.TaskActivity" />
+        <activity android:name=".ui.tasks.NewTaskActivity" />
+        <activity android:name=".ui.tasks.AddNewTaskTypeActivity" />
+
         <activity android:name=".ui.home.Act.listAct.GiveCodEmailActivity" />
         <activity android:name=".ui.home.SettingsActivity" />
-        <activity android:name=".ui.home.Act.listAct.NewTaskActivity" />
         <activity android:name=".ui.home.Act.listAct.NameNewActivity" />
         <activity android:name=".ui.home.Act.listAct.EmailNewActivity" />
         <activity android:name=".ui.home.Act.listAct.PasswordNewActivity" />

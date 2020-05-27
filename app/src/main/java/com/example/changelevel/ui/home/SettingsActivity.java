@@ -1,26 +1,16 @@
 package com.example.changelevel.ui.home;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -28,19 +18,22 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.changelevel.CustomAdapters.CustomAdapterListAct;
 import com.example.changelevel.LoginAndRegistration.LoginActivity;
-import com.example.changelevel.MainActivity;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelListAct;
 import com.example.changelevel.ui.home.Act.DataListAct;
 import com.example.changelevel.ui.home.Act.listAct.EmailNewActivity;
 import com.example.changelevel.ui.home.Act.listAct.NameNewActivity;
-import com.example.changelevel.ui.home.Act.listAct.NewTaskActivity;
 import com.example.changelevel.ui.home.Act.listAct.PasswordNewActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -147,9 +140,6 @@ public class SettingsActivity extends AppCompatActivity {
                 case 2:
                     intent = new Intent(context, PasswordNewActivity.class);
                     break;
-                case 3:
-                    intent = new Intent(context, NewTaskActivity.class);
-                    break;
             }
 
             if(intent!=null)
@@ -214,7 +204,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                         break;
                     case 1:
-                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                         photoPickerIntent.setType("image/*");
                         startActivityForResult(photoPickerIntent, PICK_IMAGE_REQUEST);
                         break;

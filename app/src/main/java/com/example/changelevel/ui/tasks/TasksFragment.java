@@ -13,12 +13,13 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskFS;
@@ -32,6 +33,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -47,67 +49,105 @@ public class TasksFragment extends Fragment {
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
     private static ArrayList<DataModelTask> data;
-    private ImageButton imageButtonFiltersFragmentHome;
+    private ImageButton imageButtonFiltersFragmentHome, ibAddTaskType;
     private static TaskFS task;
     private SwipeRefreshLayout swipeRefreshLayout;
     private View root;
     private ProgressBar progressBar_tasksTape;
+    private FloatingActionButton fabStartNewTaskActivity;
+    LinearLayoutManager layoutManager;
 
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
     private Query taskSort;
-    private String taskSortFilter = "minLevel";
-    private Query.Direction taskSortType = Query.Direction.DESCENDING;
 
     private Gson gson = new Gson();
     private User user;
+    private boolean isUpdateChips = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-            ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container, final Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_tasks, container, false);
+
         init();
 
+        if(user.isAdmin()||user.isWriter()){
+            fabStartNewTaskActivity.setVisibility(View.VISIBLE);
+            fabStartNewTaskActivity.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), NewTaskActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
 
         imageButtonFiltersFragmentHome.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { StartBottomSheetDialog(); }});
+            public void onClick(View v) { startBottomSheetDialog(); }});
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                UpdateTasksList();
+                updateTasksList();
             }
         });
 
+        data.clear();
+        recyclerView.setAdapter(adapter);
 
+        progressBar_tasksTape.setVisibility(View.VISIBLE);
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()-3) {
+                        addTasksToList();
+                    }
+                }
+            }
+        });
         return root;
     }
 
     private void init(){
+        updateUser();
         myOnClickListener=new MyOnClickListener(getActivity());
         recyclerView = root.findViewById(R.id.tasks_recycler_view);
+        fabStartNewTaskActivity = root.findViewById(R.id.fab_newTask_fragment_task);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
+        layoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         data = new ArrayList<DataModelTask>();
+        taskSort = firestore.collection("tasks").whereLessThanOrEqualTo("minLevel", user.checkLevel());
         progressBar_tasksTape = root.findViewById(R.id.pb_tasksTape_fragment_tasks);
         imageButtonFiltersFragmentHome = root.findViewById(R.id.imageButton_filters_fragment_home);
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout_fragment_tasks);
+        updateTasksList();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        updateUser();
+        if (isUpdateChips) {
+            startBottomSheetDialog();
+            isUpdateChips = false;
+        }
+    }
+
+    private void updateUser(){
         SharedPreferences sharedPreferences = getContext()
                 .getSharedPreferences(user.APP_PREFERENCES_USER, getContext().MODE_PRIVATE);
         user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
-        taskSort = firestore.collection("tasks").whereLessThanOrEqualTo("minLevel", user.checkLevel())
-                .orderBy(taskSortFilter, taskSortType);
-        UpdateTasksList();
-
     }
+
+
+
+
 
 
     private class MyOnClickListener implements View.OnClickListener {
@@ -126,84 +166,82 @@ public class TasksFragment extends Fragment {
             int selectedItemPosition = recyclerView.getChildPosition(view);
             RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForPosition(selectedItemPosition);
             DataModelTask task = TasksFragment.data.get(selectedItemPosition);
-            Intent intent = new Intent(context, TaskActivity.class);
-
-            intent.putExtra("task", gson.toJson(task));
-            context.startActivity(intent);
+            if (!task.isBlocked()) {
+                Intent intent = new Intent(context, TaskActivity.class);
+                intent.putExtra("task", gson.toJson(task));
+                context.startActivity(intent);
+            }else Toast.makeText(getContext(), "Вам нужно повысить уровень чтобы выполнить заданее", Toast.LENGTH_LONG);
 
         }
     }
 
     private DocumentSnapshot lastVisible;
-    private void UpdateTasksList(){
+    private void updateTasksList(){
         data.clear();
-        recyclerView.setAdapter(adapter);
-
-        progressBar_tasksTape.setVisibility(View.VISIBLE);
-
-        taskSort.limit(3).get()
+        taskSort.limit(10).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             task = document.toObject(TaskFS.class);
-                                                        data.add(new DataModelTask(document.getId(),
+                            data.add(new DataModelTask(document.getId(),
                                     task.getTaskName(),
                                     task.getTaskOverview(),
                                     task.getTaskType(),
-                                    (int)task.getTaskXP()
-                                    ,CheckTaskCompleted(document.getId())));
+                                    (int) task.getTaskXP(),
+                                    (int) task.getMinLevel(),
+                                    CheckTaskCompleted(document.getId()),
+                                    (task.getMinLevel() > user.checkLevel())));
                         }
-                        lastVisible = queryDocumentSnapshots.getDocuments()
-                                .get(queryDocumentSnapshots.size() - 1);
-                        adapter = new CustomAdapterTask(data);
+                        try {
+                            lastVisible = queryDocumentSnapshots.getDocuments()
+                                    .get(queryDocumentSnapshots.size() - 1);
+                            adapter = new CustomAdapterTask(data);
+                            progressBar_tasksTape.setVisibility(View.GONE);
+                            recyclerView.setAdapter(adapter);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(getActivity(), "Заданий нет", Toast.LENGTH_LONG).show();
+                        }
                         progressBar_tasksTape.setVisibility(View.GONE);
                         swipeRefreshLayout.setRefreshing(false);
                         recyclerView.setAdapter(adapter);
-                        Button button = root.findViewById(R.id.addTask_fragment_tasks);
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                progressBar_tasksTape.setVisibility(View.VISIBLE);
-                                try {
-                                    taskSort.startAfter(lastVisible)
-                                            .limit(3).get()
-                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                                        task = document.toObject(TaskFS.class);
-                                                        data.add(new DataModelTask(document.getId(),
-                                                                task.getTaskName(),
-                                                                task.getTaskOverview(),
-                                                                task.getTaskType(),
-                                                                (int)task.getTaskXP()
-                                                                ,CheckTaskCompleted(document.getId())));
-                                                        document.getReference();
-                                                    }
-                                                    try {
-                                                        lastVisible = queryDocumentSnapshots.getDocuments()
-                                                                .get(queryDocumentSnapshots.size() - 1);
-                                                        adapter = new CustomAdapterTask(data);
-                                                        progressBar_tasksTape.setVisibility(View.GONE);
-                                                        recyclerView.setAdapter(adapter);
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
-                                                        progressBar_tasksTape.setVisibility(View.GONE);
-                                                        Toast.makeText(getActivity(), "Задания закончились", Toast.LENGTH_LONG).show();
-                                                    }
-                                                }
-                                            });
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    progressBar_tasksTape.setVisibility(View.GONE);
-                                }
-                            }
-
-                        });
                     }
                 });
-    }
+
+                    }
+
+                    private void addTasksToList(){
+                        progressBar_tasksTape.setVisibility(View.VISIBLE);
+                        taskSort.startAfter(lastVisible)
+                                .limit(3).get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                            task = document.toObject(TaskFS.class);
+                                            data.add(new DataModelTask(document.getId(),
+                                                    task.getTaskName(),
+                                                    task.getTaskOverview(),
+                                                    task.getTaskType(),
+                                                    (int)task.getTaskXP(),
+                                                    (int)task.getMinLevel(),
+                                                    CheckTaskCompleted(document.getId()),
+                                                    (task.getMinLevel()>user.checkLevel())));
+                                            document.getReference();
+                                        }
+                                        try {
+                                            lastVisible = queryDocumentSnapshots.getDocuments()
+                                                    .get(queryDocumentSnapshots.size() - 1);
+                                            adapter.notifyDataSetChanged();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        progressBar_tasksTape.setVisibility(View.GONE);
+                                    }
+                                });
+                    }
+
 
     private boolean CheckTaskCompleted(String idTask){
         for (int i = 0; i<user.getTasksCompleted().size(); i++){
@@ -218,24 +256,37 @@ public class TasksFragment extends Fragment {
     private ArrayList<Chip> chips = new ArrayList<Chip>();
     private ChipGroup chipGroup;
     private ProgressBar progressLoading;
-
-    public void StartBottomSheetDialog(){
+    private BottomSheetDialog dialog;
+    public void startBottomSheetDialog(){
+        dialog = new BottomSheetDialog(getContext());
         View view = getLayoutInflater().inflate(R.layout.filters_task_list_dialog_bottom_sheet_fragment, null);
         progressLoading = view.findViewById(R.id.pb_loading_bottom_sheet_filters);
         chipGroup = view.findViewById(R.id.cg_taskType_bottom_sheet_filters);
-        BottomSheetDialog dialog = new BottomSheetDialog(getContext());
+        ibAddTaskType = view.findViewById(R.id.ib_addTaskType_bottom_sheet_filters);
         dialog.setContentView(view);
-        dialog.show();
         updateChips();
+
         chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(ChipGroup group, int checkedId) {
-                Toast.makeText(getContext(), chips.get(checkedId).getText().toString(), Toast.LENGTH_LONG).show();
+                Chip chip = chipGroup.findViewById(checkedId);
+                if (chip!=null) {
+                    if (chip.getText().toString().equals("Все"))
+                        taskSort = firestore.collection("tasks");
+                    else
+                        taskSort = firestore.collection("tasks").whereEqualTo("taskType", chip.getText().toString());
+                }else taskSort = firestore.collection("tasks").whereLessThanOrEqualTo("minLevel", user.checkLevel());
+                updateTasksList();
             }
         });
+        dialog.show();
+
+
     }
 
     private void updateChips(){
+        progressLoading.setVisibility(View.GONE);
+        addChipFilter("Все");
         firestore.collection("taskTypes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -243,20 +294,35 @@ public class TasksFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                chip = (Chip) getLayoutInflater().inflate(R.layout.chip_task_type,
-                                        null, false);
-                                chip.setText(document.toObject(TaskTypeFS.class).getNameType());
-                                chips.add(chip);
-                                chipGroup.addView(chip);
+                                addChipFilter(document.toObject(TaskTypeFS.class).getNameType());
                             }
                             stopLoading();
+
                         }
                     }
                 });
     }
 
+    private void addChipFilter(String name){
+        chip = (Chip) getLayoutInflater().inflate(R.layout.chip_task_type,
+                null, false);
+        chip.setText(name);
+        chipGroup.addView(chip);
+    }
+
     private void stopLoading(){
-        progressLoading.setVisibility(View.GONE);
         chipGroup.setVisibility(View.VISIBLE);
+        if(user.isAdmin()){
+            ibAddTaskType.setVisibility(View.VISIBLE);
+            ibAddTaskType.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isUpdateChips = true;
+                    Intent intent = new Intent(getActivity(), AddNewTaskTypeActivity.class);
+                    dialog.dismiss();
+                    startActivity(intent);
+                }
+            });
+        }
     }
 }
