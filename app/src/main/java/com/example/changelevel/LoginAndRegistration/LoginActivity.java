@@ -1,12 +1,18 @@
 package com.example.changelevel.LoginAndRegistration;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +34,7 @@ import com.google.gson.Gson;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
     private TextInputLayout email, password;
     private ProgressBar progressBar;
     @Override
@@ -35,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
-
+        currentUser = mAuth.getCurrentUser();
         email = findViewById(R.id.til_email_activity_login);
         password = findViewById(R.id.til_password_activity_login);
         progressBar = findViewById(R.id.pb_activity_login);
@@ -90,8 +97,50 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+        findViewById(R.id.b_restart_password_activity_login).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startDialogRestartPassword();
+            }
+        });
 
         }
+    Dialog dialogRestartPassword;
+    private void startDialogRestartPassword(){
+        dialogRestartPassword = new Dialog(this);
+        dialogRestartPassword.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogRestartPassword.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogRestartPassword.setContentView(R.layout.dialog_restart_password);
+        Button ok = dialogRestartPassword.findViewById(R.id.b_ok_dialog_restart_password);
+        Button cancel = dialogRestartPassword.findViewById(R.id.b_cancel_dialog_restart_password);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogRestartPassword.dismiss();
+            }});
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (email.getEditText().getText().toString().trim().isEmpty()){
+                    email.setError("Для получения письма заполните поле");
+                    dialogRestartPassword.dismiss();
+                }
+                else {
+                    mAuth.sendPasswordResetEmail(email.getEditText().getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful())
+                                Toast.makeText(LoginActivity.this, "Письмо отправлено", Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(LoginActivity.this, "Письмо не получилось отправить", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        });
+        dialogRestartPassword.show();
+    }
+
 
 
     private void clearErrorEditText(){
@@ -135,6 +184,11 @@ public class LoginActivity extends AppCompatActivity {
         if(password.getEditText().getText().toString().trim().isEmpty()) password.setError("Пустое поле");
             else password.setError(null);
         return !email.getEditText().getText().toString().trim().isEmpty() && !password.getEditText().getText().toString().trim().isEmpty();
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
     }
 
 

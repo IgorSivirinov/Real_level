@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -19,8 +21,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -34,8 +38,16 @@ import com.example.changelevel.models.DataModels.DataModelListAct;
 import com.example.changelevel.ui.home.Act.DataListAct;
 import com.example.changelevel.ui.home.Act.listAct.EmailNewActivity;
 import com.example.changelevel.ui.home.Act.listAct.NameNewActivity;
-import com.example.changelevel.ui.home.Act.listAct.PasswordNewActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,56 +57,29 @@ import java.util.Date;
 
 public class SettingsActivity extends AppCompatActivity {
 
+
+
     private ImageButton imageButtonUser;
     private Button signOutButton;
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
-
-    //keep track of camera capture intent
-    final int CAMERA_CAPTURE = 1;
-    //captured picture uri
+    private final int CAMERA_CAPTURE = 1;
     private Uri picUri;
-    final int PICK_IMAGE_REQUEST = 2;
-    final int PIC_CROP = 3;
-    static final int REQUEST_TAKE_PHOTO = 4;
+    private final int PICK_IMAGE_REQUEST = 2;
+    private final int PIC_CROP = 3;
+    private static final int REQUEST_TAKE_PHOTO = 4;
     private String mCurrentPhotoPath;
     private Uri photoURI;
+    private ImageButton imageButtonBack;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<DataModelListAct> data;
+    private RecyclerView.Adapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        ImageButton imageButtonBack = findViewById(R.id.imageButton_back_toolbar_activity_settings);
-        imageButtonBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-
-        });
-        imageButtonUser = findViewById(R.id.icon_user_activity_settings);
-        imageButtonUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogNewIconUser();
-            }
-        });
-        myOnClickListener=new MyOnClickListener(this);
-        recyclerView=findViewById(R.id.recycler_view_act);
-        recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 1);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        ArrayList<DataModelListAct> data = new ArrayList<DataModelListAct>();
-        for (int i = 0; i< DataListAct.id.length; i++)
-        {
-            data.add(new DataModelListAct(DataListAct.id[i],
-                    DataListAct.nameArray[i],
-                    DataListAct.iconArray[i]));
-        }
-        RecyclerView.Adapter adapter = new CustomAdapterListAct(data);
-        recyclerView.setAdapter(adapter);
-        signOutButton = findViewById(R.id.b_signOut_activity_settings);
+        init();
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,6 +88,42 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        imageButtonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+
+        });
+        imageButtonUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogNewIconUser();
+            }
+        });
+
+        for (int i = 0; i< DataListAct.id.length; i++)
+        {
+            data.add(new DataModelListAct(DataListAct.id[i],
+                    DataListAct.nameArray[i],
+                    DataListAct.iconArray[i]));
+        }
+        adapter = new CustomAdapterListAct(data);
+        recyclerView.setAdapter(adapter);
+
+    }
+    private void init(){
+
+        imageButtonUser = findViewById(R.id.icon_user_activity_settings);
+        imageButtonBack = findViewById(R.id.imageButton_back_toolbar_activity_settings);
+        signOutButton = findViewById(R.id.b_signOut_activity_settings);
+        recyclerView=findViewById(R.id.recycler_view_act);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new GridLayoutManager(this, 1);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        data = new ArrayList<DataModelListAct>();
+        myOnClickListener=new MyOnClickListener(this);
     }
 
     private void signOut() {
@@ -111,17 +132,26 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private static class MyOnClickListener implements View.OnClickListener {
+        private FirebaseFirestore firestore;
         private Boolean passwordCheck = false;
         private final Context context;
         private Intent intent;
-        RecyclerView.ViewHolder viewHolder;
-        EditText password;
+        private RecyclerView.ViewHolder viewHolder;
+        private TextInputLayout password;
+        private FirebaseAuth mAuth;
+        private FirebaseUser currentUser;
+        private Button bOkDialogRestartPassword;
+        private AuthCredential credential;
+        private ProgressBar loadingGivePassword;
         private MyOnClickListener(Context context) {
             this.context = context;
         }
 
         @Override
         public void onClick(View v) {
+            firestore = FirebaseFirestore.getInstance();
+            mAuth = FirebaseAuth.getInstance();
+            currentUser = mAuth.getCurrentUser();
             removeItem(v);
         }
 
@@ -135,39 +165,181 @@ public class SettingsActivity extends AppCompatActivity {
                     intent = new Intent(context, NameNewActivity.class);
                     break;
                 case 1:
-                    intent = new Intent(context, EmailNewActivity.class);
+                    final Dialog dialog = new Dialog(context);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialog.setContentView(R.layout.dialog_give_password);
+                    password = dialog.findViewById(R.id.til_password_dialog_give_password);
+                    bOkDialogRestartPassword = dialog.findViewById(R.id.b_ok_dialog_give_password);
+                    loadingGivePassword = dialog.findViewById(R.id.pb_loading_dialog_give_password);
+                    clearErrorEditText();
+                    bOkDialogRestartPassword.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (checkEmptyString()) {
+                                loadingGivePassword.setVisibility(View.VISIBLE);
+                                currentUser.reauthenticate(EmailAuthProvider.getCredential(currentUser.getEmail(),
+                                        password.getEditText().getText().toString().trim()))
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                    intent = new Intent(context, EmailNewActivity.class);
+                                                    loadingGivePassword.setVisibility(View.GONE);
+                                                    dialog.dismiss();
+                                                    context.startActivity(intent);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        password.setError("Не верный пароль");
+                                        loadingGivePassword.setVisibility(View.GONE);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    dialog.show();
                     break;
                 case 2:
-                    intent = new Intent(context, PasswordNewActivity.class);
+                    startDialogRestartPassword();
+                    break;
+                case 3:
+                    final Dialog dialogGivePassword = new Dialog(context);
+                    dialogGivePassword.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialogGivePassword.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialogGivePassword.setContentView(R.layout.dialog_give_password);
+
+                    password = dialogGivePassword.findViewById(R.id.til_password_dialog_give_password);
+                    bOkDialogRestartPassword = dialogGivePassword.findViewById(R.id.b_ok_dialog_give_password);
+                    loadingGivePassword = dialogGivePassword.findViewById(R.id.pb_loading_dialog_give_password);
+
+                    clearErrorEditText();
+                    bOkDialogRestartPassword.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (checkEmptyString()) {
+                                loadingGivePassword.setVisibility(View.VISIBLE);
+                                currentUser.reauthenticate(EmailAuthProvider.getCredential(currentUser.getEmail(),
+                                        password.getEditText().getText().toString().trim()))
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                startDialogDeleteAccount();
+                                                dialogGivePassword.dismiss();
+                                                loadingGivePassword.setVisibility(View.GONE);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        password.setError("Не верный пароль");
+                                        loadingGivePassword.setVisibility(View.GONE);
+
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    dialogGivePassword.show();
                     break;
             }
 
             if(intent!=null)
                 context.startActivity(intent);
         }
-
-        private void dialogGivePassword(){
-            Dialog dialog = new Dialog(context);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialog.setContentView(R.layout.dialog_give_password);
-
-            password = dialog.findViewById(R.id.et_password_dialog_give_password);
-            Button restartPassword = dialog.findViewById(R.id.b_forgot_password_dialog_give_password);
-            restartPassword.setOnClickListener(new View.OnClickListener() {
+        private void clearErrorEditText(){
+            password.getEditText().addTextChangedListener(new TextWatcher() {
                 @Override
-                public void onClick(View v) { dialogRestartPassword(); }});
-            Button ok = dialog.findViewById(R.id.b_ok_dialog_give_password);
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    password.setError(null);
+                }
 
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
         }
 
-        private void dialogRestartPassword(){
-            Dialog dialog = new Dialog(context);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialog.setContentView(R.layout.dialog_restart_password);
-            dialog.show();
+        private boolean checkEmptyString(){
+            if (password.getEditText().getText().toString().trim().isEmpty()) password.setError("Пустое поле");
+            return !password.getEditText().getText().toString().trim().isEmpty();
         }
+
+
+
+        Dialog dialogRestartPassword;
+        private void startDialogRestartPassword(){
+            dialogRestartPassword = new Dialog(context);
+            dialogRestartPassword.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogRestartPassword.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialogRestartPassword.setContentView(R.layout.dialog_restart_password);
+            Button ok = dialogRestartPassword.findViewById(R.id.b_ok_dialog_restart_password);
+            Button cancel = dialogRestartPassword.findViewById(R.id.b_cancel_dialog_restart_password);
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialogRestartPassword.dismiss();
+                }});
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mAuth.sendPasswordResetEmail(currentUser.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful())
+                                 Toast.makeText(context, "Письмо отправлено", Toast.LENGTH_LONG).show();
+                            else Toast.makeText(context, "Письмо не получилось отправить", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
+            dialogRestartPassword.show();
+        }
+        private Dialog dialogDeleteAccount;
+        private void startDialogDeleteAccount(){
+            dialogDeleteAccount = new Dialog(context);
+            dialogDeleteAccount.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogDeleteAccount.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialogDeleteAccount.setContentView(R.layout.dialog_delete_account);
+            Button delete = dialogDeleteAccount.findViewById(R.id.b_accountDeletion_dialog_delete_account);
+            Button cancel = dialogDeleteAccount.findViewById(R.id.b_cancel_dialog_delete_account);
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialogDeleteAccount.dismiss();
+                }});
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    firestore.collection("users").document(currentUser.getUid()).delete()
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        currentUser.delete()
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()){
+                                                            intent = new Intent(context, LoginActivity.class);
+                                                            context.startActivity(intent);
+                                                        }else Toast.makeText(context, "Ошибка с потеряй данных.\n" +
+                                                                "Обратитесь в техподдержку", Toast.LENGTH_LONG);
+                                                    }
+                                                });
+                                    } else Toast.makeText(context, "Не удалось удалить аккаунт", Toast.LENGTH_LONG);
+                                }
+                            });
+                }
+            });
+            dialogDeleteAccount.show();
+        }
+
 
     }
 

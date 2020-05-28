@@ -1,68 +1,97 @@
 package com.example.changelevel.ui.home.Act.listAct;
 
-import android.app.Dialog;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.Gson;
 
 public class EmailNewActivity extends AppCompatActivity {
-    Button button;
-    EditText password;
+    private FirebaseUser userF;
+    private Button bChangeEmail;
+    private TextInputLayout email;
+    private User user;
+    private ImageButton ibBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_email_new);
-
-        button = findViewById(R.id.b_activity_email_new);
-        button.setOnClickListener(new View.OnClickListener() {
+        init();
+        ibBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogGivePassword();
+                finish();
             }
         });
-    }
-
-
-
-    private void DialogGivePassword(){
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setContentView(R.layout.dialog_give_password);
-
-        password = dialog.findViewById(R.id.et_password_dialog_give_password);
-        Button restartPassword = dialog.findViewById(R.id.b_forgot_password_dialog_give_password);
-        restartPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { DialogRestartPassword(); }});
-        Button ok = dialog.findViewById(R.id.b_ok_dialog_give_password);
-        ok.setOnClickListener(new View.OnClickListener() {
+        bChangeEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(password.getText().toString().equals("1234")) {
-                  Intent  intent = new Intent(EmailNewActivity.this, GiveCodEmailActivity.class);
-                  startActivity(intent);
+                if (checkEmptyString()){
+                    userF.updateEmail(email.getEditText().getText().toString().trim())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful())
+                                        finish();
+                                    else
+                                    Toast.makeText(EmailNewActivity.this, "Неполучилось изменить e-mail",Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 }
             }
         });
-        dialog.show();
     }
 
-    private void DialogRestartPassword(){
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setContentView(R.layout.dialog_restart_password);
-        dialog.show();
+    private void init(){
+        Gson gson = new Gson();
+        SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""), User.class);
+        userF = FirebaseAuth.getInstance().getCurrentUser();
+        email = findViewById(R.id.til_email_activity_email_new);
+        email.getEditText().setText(user.getEmail());
+        bChangeEmail = findViewById(R.id.b_activity_email_new);
+        ibBack = findViewById(R.id.ib_back_toolbar_activity_email_new);
+        clearErrorEditText();
     }
+
+    private void clearErrorEditText(){
+        email.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                email.setError(null);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private boolean checkEmptyString(){
+        if (email.getEditText().getText().toString().trim().isEmpty()) email.setError("Пустое поле");
+        return !email.getEditText().getText().toString().trim().isEmpty();
+    }
+
 }

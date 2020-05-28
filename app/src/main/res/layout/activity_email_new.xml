@@ -17,7 +17,7 @@
             android:layout_height="wrap_content">
 
             <ImageButton
-                android:id="@+id/imageButton_back_toolbar_activity_settings"
+                android:id="@+id/ib_back_toolbar_activity_email_new"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="@drawable/ripple_null_background_round"
@@ -33,17 +33,25 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-    <EditText
-        android:id="@+id/et_email_activity_email_new"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_email_activity_email_new"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:hint="e-mail"/>
+        android:layout_margin="16dp"
+        android:hint="E-mail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/b_activity_email_new"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:text="Изменить"
         android:layout_gravity="right"/>
 </LinearLayout>

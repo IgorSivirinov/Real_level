@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskTypeFS;
 import com.example.changelevel.R;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,6 +56,14 @@ public class AddNewTaskTypeActivity extends AppCompatActivity {
         });
 
     }
+
+    private void init(){
+        pbLoading = findViewById(R.id.pb_loading_activity_add_new_task_type);
+        ibBack = findViewById(R.id.ib_back_toolbar_activity_add_new_task_type);
+        bCreate = findViewById(R.id.b_create_activity_add_new_task_type);
+        tilNameType = findViewById(R.id.til_nameType_activity_add_new_task_type);
+    }
+
     private void clearErrorEditText(){
         tilNameType.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
@@ -77,12 +86,5 @@ public class AddNewTaskTypeActivity extends AppCompatActivity {
     private boolean checkEmptyString(){
         if (tilNameType.getEditText().getText().toString().trim().isEmpty()) tilNameType.setError("Пустое поле");
         return !tilNameType.getEditText().getText().toString().trim().isEmpty();
-    }
-
-    private void init(){
-        pbLoading = findViewById(R.id.pb_loading_activity_add_new_task_type);
-        ibBack = findViewById(R.id.ib_back_toolbar_activity_add_new_task_type);
-        bCreate = findViewById(R.id.b_create_activity_add_new_task_type);
-        tilNameType = findViewById(R.id.til_nameType_activity_add_new_task_type);
     }
 }

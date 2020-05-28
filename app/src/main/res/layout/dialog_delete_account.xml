@@ -17,8 +17,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Вам на почту будет отправлено
-            сообщение с ссылкой для изменения пароля."
+            android:text="Вы уверины, что хотите удалить свой аккаунт?"
             android:textColor="@color/darkGray"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +32,7 @@
             app:layout_constraintTop_toBottomOf="parent">
 
             <Button
-                android:id="@+id/b_cancel_dialog_restart_password"
+                android:id="@+id/b_cancel_dialog_delete_account"
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -43,11 +42,12 @@
                 android:text="Отмена" />
 
             <Button
-                android:id="@+id/b_ok_dialog_restart_password"
+                android:id="@+id/b_accountDeletion_dialog_delete_account"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="Отправить" />
+                android:backgroundTint="@color/red"
+                android:text="Удалить" />
 
         </LinearLayout>
     </LinearLayout>
