@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <androidx.cardview.widget.CardView
+        android:background="@drawable/ripple_null_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+            <LinearLayout
+                android:layout_margin="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+               <TextView
+                   android:id="@+id/tv_nameTask_layout_card_task_completed"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:text="Test task name"
+                   android:textColor="@color/darkGray"
+                   android:textSize="30sp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp">
+                    <TextView
+                        android:id="@+id/tv_name_layout_card_task_completed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/darkGray"
+                        android:textSize="24sp"
+                        android:text="Test"/>
+                    <TextView
+                        android:id="@+id/tv_xp_layout_card_task_completed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/xpColor"
+                        android:textSize="24sp"
+                        android:gravity="right"
+                        android:text="+0 XP"/>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_userComments_layout_card_task_completed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет"/>
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="16dp"
+                    android:background="?android:attr/listDivider" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="left">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="right">
+
+                    <ImageButton
+                        android:id="@+id/ib_additionalAction_layout_card_task_completed"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/ripple_null_background_round"
+                        android:src="@drawable/ic_additional_actions" />
+                </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

@@ -63,10 +63,11 @@ public class SettingsActivity extends AppCompatActivity {
     private Button signOutButton;
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
-    private final int CAMERA_CAPTURE = 1;
+    private final int CAMERA_CAPTURE = 5;
     private Uri picUri;
-    private final int PICK_IMAGE_REQUEST = 2;
-    private final int PIC_CROP = 3;
+    private final int PICK_IMAGE_REQUEST = 6;
+    private final int PIC_CROP = 2;
+    final int CAMERA_REQUEST = 1;
     private static final int REQUEST_TAKE_PHOTO = 4;
     private String mCurrentPhotoPath;
     private Uri photoURI;
@@ -358,22 +359,18 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch ((int)id){
                     case 0:
-                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                            File photoFile = null;
-                            try {
-                                photoFile = createImageFile();
-                            } catch (IOException ex) {
-                                Toast.makeText(getApplicationContext(), "Error!", Toast.LENGTH_SHORT).show();
-                            }
-                            if (photoFile != null) {
-                                photoURI = FileProvider.getUriForFile(getApplicationContext(),
-                                        "com.example.fileProvider",
-                                        photoFile);
-                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-                            }
-                }
+                        try {
+                            // Намерение для запуска камеры
+                            Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(captureIntent, CAMERA_REQUEST);
+                        } catch (ActivityNotFoundException e) {
+                            // Выводим сообщение об ошибке
+                            String errorMessage = "Ваше устройство не поддерживает съемку";
+                            Toast toast = Toast
+                                    .makeText(SettingsActivity.this, errorMessage, Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+
                         break;
                     case 1:
                         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -407,18 +404,35 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            if(requestCode == CAMERA_CAPTURE){
+            // Вернулись от приложения Камера
+            if (requestCode == CAMERA_REQUEST) {
+                // Получим Uri снимка
                 picUri = data.getData();
-                performCrop();
-            }else if(requestCode == PIC_CROP){
-                Bundle extras = data.getExtras();
-                Bitmap thePic = (Bitmap) extras.get("data");
-                imageButtonUser.setImageBitmap(thePic);
-            }else if(requestCode == PICK_IMAGE_REQUEST){
-                picUri= data.getData();
+                // кадрируем его
                 performCrop();
             }
+            // Вернулись из операции кадрирования
+            else if(requestCode == PIC_CROP){
+                Bundle extras = data.getExtras();
+                // Получим кадрированное изображение
+                Bitmap thePic = extras.getParcelable("data");
+                // передаём его в ImageView
+                imageButtonUser.setImageBitmap(thePic);
+            }
         }
+//        if (resultCode == RESULT_OK) {
+//            if(requestCode == CAMERA_CAPTURE){
+//                picUri = data.getData();
+//                performCrop();
+//            }else if(requestCode == PIC_CROP){
+//                Bundle extras = data.getExtras();
+//                Bitmap thePic = (Bitmap) extras.get("data");
+//                imageButtonUser.setImageBitmap(thePic);
+//            }else if(requestCode == PICK_IMAGE_REQUEST){
+//                picUri= data.getData();
+//                performCrop();
+//            }
+//        }
     }
 
     private void performCrop(){

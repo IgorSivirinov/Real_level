@@ -12,9 +12,9 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.changelevel.ui.dashboard.DashboardFragment"
+        android:name="com.example.changelevel.ui.community.CommunityFragment"
 
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_commutity" />
 
     <fragment
         android:id="@+id/navigation_notifications"

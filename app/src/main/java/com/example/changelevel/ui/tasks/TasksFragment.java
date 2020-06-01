@@ -55,7 +55,7 @@ public class TasksFragment extends Fragment {
     private View root;
     private ProgressBar progressBar_tasksTape;
     private FloatingActionButton fabStartNewTaskActivity;
-    LinearLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
 
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
@@ -96,7 +96,6 @@ public class TasksFragment extends Fragment {
         data.clear();
         recyclerView.setAdapter(adapter);
 
-        progressBar_tasksTape.setVisibility(View.VISIBLE);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

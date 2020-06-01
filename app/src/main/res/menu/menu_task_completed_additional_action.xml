@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:visible="false"
+        android:id="@+id/delete_menu_task_completed_additional_action"
+        android:title="Удалить" />
+    <item
+        android:visible="false"
+        android:id="@+id/fine_menu_task_completed_additional_action"
+        android:title="Оштрафовать" />
+    <item
+        android:id="@+id/complaint_menu_task_completed_additional_action"
+        android:title="Жалоба" />
+</menu>

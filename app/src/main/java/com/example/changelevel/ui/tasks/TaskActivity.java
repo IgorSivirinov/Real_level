@@ -18,14 +18,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskCompletedTapeFS;
+import com.example.changelevel.API.Firebase.Firestor.TaskFS;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTask;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
+
+import java.util.Date;
+
 
 public class TaskActivity extends AppCompatActivity {
     private Button bCompleted, bDelete;
@@ -69,11 +74,15 @@ public class TaskActivity extends AppCompatActivity {
         bCompleted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                user.addTaskCompleted(task.getId());
+                user.setXp(user.getXp()+task.getXp());
+
                 firestore.collection("taskCompletedTape")
                         .add(new TaskCompletedTapeFS(
-                                task.getId(),
-                                    task.getOverview(),
-                                        task.getXp()))
+                                new TaskFS(task.getName(),null,null,    task.getXp(), 0),
+                                user,
+                                null,
+                                new Timestamp(new Date())))
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
@@ -81,8 +90,6 @@ public class TaskActivity extends AppCompatActivity {
                                 .update("tasksCompleted", FieldValue.arrayUnion(task.getId()));
                         firestore.collection("users").document(user.getIdUser())
                                 .update("xp", user.getXp()+task.getXp());
-                        user.addTaskCompleted(task.getId());
-                        user.setXp(user.getXp()+task.getXp());
                         SharedPreferences.Editor editorUser = sharedPreferences.edit();
                         editorUser.putString(user.APP_PREFERENCES_USER, gson.toJson(user));
                         editorUser.apply();
