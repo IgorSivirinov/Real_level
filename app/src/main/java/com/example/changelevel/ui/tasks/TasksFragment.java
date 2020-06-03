@@ -113,7 +113,7 @@ public class TasksFragment extends Fragment implements TaskActivity.OnTaskComple
                     }
                 }
                 if (dy > 0) {
-                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) > layoutManager.getItemCount()) {
+                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) > layoutManager.getItemCount()-0.01) {
                         progressBar_tasksTape.setVisibility(View.VISIBLE);
             }
         }

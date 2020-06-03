@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -47,6 +48,7 @@ public class UsersFragment extends Fragment {
     public static View.OnClickListener myOnClickListener;
     private LinearLayoutManager layoutManager;
     private boolean isUpdateUsersList = true;
+    private Gson gson = new Gson();
 
     private static ArrayList<User> data;
     private View root;
@@ -171,7 +173,9 @@ public class UsersFragment extends Fragment {
             int selectedItemPosition = recyclerViewUsers.getChildPosition(view);
             RecyclerView.ViewHolder viewHolder = recyclerViewUsers.findViewHolderForPosition(selectedItemPosition);
             User user = UsersFragment.data.get(selectedItemPosition);
-
+            Intent intent = new Intent(context, UserActivity.class);
+            intent.putExtra("user", gson.toJson(user));
+            context.startActivity(intent);
         }
     }
 

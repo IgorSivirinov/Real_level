@@ -42,7 +42,7 @@ public class HomeFragment extends Fragment {
     private ProgressBar pbLoadingHistory;
     private SwipeRefreshLayout srlRecyclerViewHistory;
     private RecyclerView.Adapter adapter;
-    private static RecyclerView recyclerViewTaskCompleted;
+    private static RecyclerView recyclerViewHistory;
     private LinearLayoutManager layoutManager;
     private static ArrayList<DataModelTaskCompletedTape> data;
 
@@ -65,7 +65,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        recyclerViewTaskCompleted.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerViewHistory.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -107,11 +107,11 @@ public class HomeFragment extends Fragment {
                 .orderBy("time", Query.Direction.DESCENDING);
         srlRecyclerViewHistory = root.findViewById(R.id.swipeRefreshLayout_fragment_home);
         pbLoadingHistory = root.findViewById(R.id.pb_loading_fragment_home);
-        recyclerViewTaskCompleted = root.findViewById(R.id.history_recycler_view);
-        recyclerViewTaskCompleted.setHasFixedSize(true);
+        recyclerViewHistory = root.findViewById(R.id.history_recycler_view);
+        recyclerViewHistory.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getContext(), 1);
-        recyclerViewTaskCompleted.setLayoutManager(layoutManager);
-        recyclerViewTaskCompleted.setItemAnimator(new DefaultItemAnimator());
+        recyclerViewHistory.setLayoutManager(layoutManager);
+        recyclerViewHistory.setItemAnimator(new DefaultItemAnimator());
         data = new ArrayList<DataModelTaskCompletedTape>();
     }
     private DocumentSnapshot lastVisible;
@@ -134,7 +134,7 @@ public class HomeFragment extends Fragment {
                         pbLoadingHistory.setVisibility(View.GONE);
                         adapter = new CustomAdapterHistory(data);
                         srlRecyclerViewHistory.setRefreshing(false);
-                        recyclerViewTaskCompleted.setAdapter(adapter);
+                        recyclerViewHistory.setAdapter(adapter);
                     }
                 });
 
@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment {
 
     private void addTaskHistory(){
         historySort.startAfter(lastVisible)
-                .limit(2).get()
+                .limit(3).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {

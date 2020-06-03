@@ -1,51 +1,30 @@
 package com.example.changelevel.CustomAdapters;
 
-import android.app.Dialog;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
+
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
-import com.example.changelevel.API.Firebase.Firestor.UserFS;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTaskCompletedTape;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.Gson;
+
 
 import java.util.ArrayList;
 
 public class CustomAdapterHistory extends RecyclerView.Adapter<CustomAdapterHistory.MyViewHolder> {
 
-    private Context context;
-    private int mPosition;
-    private User user;
-    private User userCreator;
-    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
     private ArrayList<DataModelTaskCompletedTape> dataSet;
 
     @NonNull
     @Override
     public CustomAdapterHistory.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_card_task_completed, parent, false);
         CustomAdapterHistory.MyViewHolder myViewHolder = new CustomAdapterHistory.MyViewHolder(view);
         return myViewHolder;
@@ -60,8 +39,7 @@ public class CustomAdapterHistory extends RecyclerView.Adapter<CustomAdapterHist
         TextView nameTask, nameUser, plusXpUser, userComments;
         ImageButton additionalAction;
 
-        mPosition = position;
-        userCreator = dataSet.get(position).getUser();
+
 
         LinearLayout llActs = holder.llActs;
         nameTask = holder.nameTask;
