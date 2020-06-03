@@ -4,16 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -43,7 +42,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class TasksFragment extends Fragment {
+public class TasksFragment extends Fragment implements TaskActivity.OnTaskCompletedListener{
 
     private RecyclerView.Adapter adapter;
     private static RecyclerView recyclerView;
@@ -64,6 +63,9 @@ public class TasksFragment extends Fragment {
     private Gson gson = new Gson();
     private User user;
     private boolean isUpdateChips = false;
+    private boolean isAddTask = true;
+
+    private boolean isUpdateTaskList = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, final Bundle savedInstanceState) {
@@ -97,15 +99,24 @@ public class TasksFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
 
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (dy > 0) {
                     if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()-3) {
-                        addTasksToList();
+                        if (isAddTask) {
+                            isAddTask = false;
+                            addTasksToList();
+                        }
                     }
                 }
+                if (dy > 0) {
+                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) > layoutManager.getItemCount()) {
+                        progressBar_tasksTape.setVisibility(View.VISIBLE);
+            }
+        }
             }
         });
         return root;
@@ -131,7 +142,11 @@ public class TasksFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateUser();
+
+        if(isUpdateTaskList){
+            updateTasksList();
+            isUpdateTaskList = false;
+        }
         if (isUpdateChips) {
             startBottomSheetDialog();
             isUpdateChips = false;
@@ -144,9 +159,11 @@ public class TasksFragment extends Fragment {
         user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
     }
 
-
-
-
+    @Override
+    public void onTaskCompletedListener() {
+        isUpdateTaskList = true;
+        Log.d("TasksFragment", "onTaskCompletedListener");
+    }
 
 
     private class MyOnClickListener implements View.OnClickListener {
@@ -176,6 +193,7 @@ public class TasksFragment extends Fragment {
 
     private DocumentSnapshot lastVisible;
     private void updateTasksList(){
+        updateUser();
         data.clear();
         taskSort.limit(10).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -189,7 +207,7 @@ public class TasksFragment extends Fragment {
                                     task.getTaskType(),
                                     (int) task.getTaskXP(),
                                     (int) task.getMinLevel(),
-                                    CheckTaskCompleted(document.getId()),
+                                    user.getTasksCompleted(),
                                     (task.getMinLevel() > user.checkLevel())));
                         }
                         try {
@@ -211,7 +229,7 @@ public class TasksFragment extends Fragment {
                     }
 
                     private void addTasksToList(){
-                        progressBar_tasksTape.setVisibility(View.VISIBLE);
+                        updateUser();
                         taskSort.startAfter(lastVisible)
                                 .limit(3).get()
                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -225,29 +243,26 @@ public class TasksFragment extends Fragment {
                                                     task.getTaskType(),
                                                     (int)task.getTaskXP(),
                                                     (int)task.getMinLevel(),
-                                                    CheckTaskCompleted(document.getId()),
+                                                    user.getTasksCompleted(),
                                                     (task.getMinLevel()>user.checkLevel())));
                                             document.getReference();
                                         }
                                         try {
                                             lastVisible = queryDocumentSnapshots.getDocuments()
                                                     .get(queryDocumentSnapshots.size() - 1);
-                                            adapter.notifyDataSetChanged();
+
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
+                                        adapter.notifyDataSetChanged();
                                         progressBar_tasksTape.setVisibility(View.GONE);
+                                        isAddTask = true;
                                     }
                                 });
                     }
 
 
-    private boolean CheckTaskCompleted(String idTask){
-        for (int i = 0; i<user.getTasksCompleted().size(); i++){
-            if (user.getTasksCompleted().get(i).equals(idTask)) return true;
-        }
-        return false;
-    }
+
 
 
 

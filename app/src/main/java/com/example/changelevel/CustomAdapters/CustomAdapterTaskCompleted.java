@@ -1,21 +1,32 @@
 package com.example.changelevel.CustomAdapters;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
+import com.example.changelevel.API.Firebase.Firestor.UserFS;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTaskCompletedTape;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
 
@@ -25,8 +36,10 @@ public class CustomAdapterTaskCompleted extends RecyclerView.Adapter<CustomAdapt
 implements PopupMenu.OnMenuItemClickListener{
 
     private Context context;
-
+    private int mPosition;
     private User user;
+    private User userCreator;
+    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
     private ArrayList<DataModelTaskCompletedTape> dataSet;
 
@@ -48,7 +61,9 @@ implements PopupMenu.OnMenuItemClickListener{
         TextView nameTask, nameUser, plusXpUser, userComments;
         ImageButton additionalAction;
 
+        mPosition = position;
         updateUser();
+        userCreator = dataSet.get(position).getUser();
 
         nameTask = holder.nameTask;
         nameUser = holder.nameUser;
@@ -85,11 +100,11 @@ implements PopupMenu.OnMenuItemClickListener{
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.complaint_menu_task_completed_additional_action:
-                return true;
             case  R.id.delete_menu_task_completed_additional_action:
+                dialogDeleteTaskCompleted();
                 return true;
             case R.id.fine_menu_task_completed_additional_action:
+                dialogDeleteTaskCompletedAndFineUser();
                 return true;
             default:
                 return false;
@@ -101,9 +116,6 @@ implements PopupMenu.OnMenuItemClickListener{
     public int getItemCount() {
         return dataSet.size();
     }
-
-
-
 
     static class MyViewHolder extends RecyclerView.ViewHolder
     {
@@ -119,5 +131,85 @@ implements PopupMenu.OnMenuItemClickListener{
             this.additionalAction = itemView.findViewById(R.id.ib_additionalAction_layout_card_task_completed);
 
         }
+    }
+
+    private void deleteTaskCompleted(){
+        firestore.collection("taskCompletedTape").document(dataSet.get(mPosition).getId()).delete();
+    }
+
+    private void deleteTaskCompletedAndFineUser(){
+        firestore.collection("taskCompletedTape").document(dataSet.get(mPosition).getId()).delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        firestore.collection("users").document(userCreator.getIdUser()).get()
+                                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                        firestore.collection("users").document(userCreator.getIdUser())
+                                                .update("xp",
+                                                        documentSnapshot.toObject(UserFS.class).getXp()-
+                                                                (dataSet.get(mPosition).getTask().getTaskXP()+(dataSet.get(mPosition).getTask().getTaskXP()/10)));
+                                    }
+                                });
+                    }
+                }) .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, "Ошибка", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void dialogDeleteTaskCompleted(){
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.dialog_delete);
+        TextView name = dialog.findViewById(R.id.tv_name_dialog_delete);
+        name.setText("Вы уверены, что хотите удалить это?");
+        Button delete = dialog.findViewById(R.id.b_deletion_dialog_delete);
+        Button cancel = dialog.findViewById(R.id.b_cancel_dialog_delete);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }});
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteTaskCompleted();
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void dialogDeleteTaskCompletedAndFineUser(){
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.dialog_delete);
+        TextView name = dialog.findViewById(R.id.tv_name_dialog_delete);
+        name.setText("Вы уверены, что хотите удалить и оштрафовать пользователя на "+
+                (dataSet.get(mPosition).getTask().getTaskXP()+(dataSet.get(mPosition).getTask().getTaskXP()/10))+
+                " XP?");
+        Button delete = dialog.findViewById(R.id.b_deletion_dialog_delete);
+        delete.setText("Удалить и оштафовать");
+        Button cancel = dialog.findViewById(R.id.b_cancel_dialog_delete);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }});
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteTaskCompletedAndFineUser();
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 }

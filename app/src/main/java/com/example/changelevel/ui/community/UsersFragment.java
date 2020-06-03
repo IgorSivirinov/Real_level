@@ -40,12 +40,13 @@ public class UsersFragment extends Fragment {
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private Query userSort;
     private User user;
-    private ProgressBar pdLoadingUser;
+    private ProgressBar pbLoadingUser;
     private SwipeRefreshLayout srlRecyclerViewUsers;
     private RecyclerView.Adapter adapter;
     private static RecyclerView recyclerViewUsers;
     public static View.OnClickListener myOnClickListener;
     private LinearLayoutManager layoutManager;
+    private boolean isUpdateUsersList = true;
 
     private static ArrayList<User> data;
     private View root;
@@ -68,10 +69,17 @@ public class UsersFragment extends Fragment {
                 super.onScrolled(recyclerView, dx, dy);
                 if (dy > 0) {
                     if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition())
-                            >= layoutManager.getItemCount()-3) {
-                        addUsersToList();
-                    }
+                            >= layoutManager.getItemCount() - 3)
+                        if (isUpdateUsersList) {
+                            isUpdateUsersList = false;
+                            addUsersToList();
+                        }
+                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition())
+                            > layoutManager.getItemCount())
+                    pbLoadingUser.setVisibility(View.VISIBLE);
                 }
+
+
             }
         });
         return root;
@@ -86,7 +94,7 @@ public class UsersFragment extends Fragment {
     private void init(){
         userSort = firestore.collection("users").orderBy("xp", Query.Direction.DESCENDING);
         srlRecyclerViewUsers = root.findViewById(R.id.swipeRefreshLayout_fragment_users);
-        pdLoadingUser = root.findViewById(R.id.pb_usersLoading_fragment_users);
+        pbLoadingUser = root.findViewById(R.id.pb_usersLoading_fragment_users);
         myOnClickListener=new UsersFragment.MyOnClickListener(getActivity());
         recyclerViewUsers = root.findViewById(R.id.rv_users_fragment_users);
         recyclerViewUsers.setHasFixedSize(true);
@@ -100,7 +108,6 @@ public class UsersFragment extends Fragment {
     private DocumentSnapshot lastVisible;
     private void updateUsersList(){
         data.clear();
-        pdLoadingUser.setVisibility(View.VISIBLE);
         userSort.limit(10).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -114,7 +121,7 @@ public class UsersFragment extends Fragment {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        pdLoadingUser.setVisibility(View.GONE);
+                        pbLoadingUser.setVisibility(View.GONE);
                         adapter = new CustomAdapterUser(data);
                         srlRecyclerViewUsers.setRefreshing(false);
                         recyclerViewUsers.setAdapter(adapter);
@@ -124,7 +131,6 @@ public class UsersFragment extends Fragment {
     }
 
     private void addUsersToList(){
-        pdLoadingUser.setVisibility(View.VISIBLE);
         userSort.startAfter(lastVisible)
                 .limit(3).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -136,11 +142,11 @@ public class UsersFragment extends Fragment {
                         try {
                             lastVisible = queryDocumentSnapshots.getDocuments()
                                     .get(queryDocumentSnapshots.size() - 1);
-
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        pdLoadingUser.setVisibility(View.GONE);
+                        pbLoadingUser.setVisibility(View.GONE);
+                        isUpdateUsersList = true;
                         adapter.notifyDataSetChanged();
                     }
                 });
@@ -167,5 +173,9 @@ public class UsersFragment extends Fragment {
             User user = UsersFragment.data.get(selectedItemPosition);
 
         }
+    }
+
+    private void dialog(){
+
     }
 }

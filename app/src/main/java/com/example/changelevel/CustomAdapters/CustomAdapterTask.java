@@ -51,14 +51,24 @@ public class CustomAdapterTask extends RecyclerView.Adapter<CustomAdapterTask.My
         minLevel.setText("Доступен с "+dataSet.get(position).getMinLevel()+" уровня");
         if (!dataSet.get(position).isBlocked()){
             blocked.setVisibility(View.GONE);
-        }
-        if (dataSet.get(position).isCompleted()){
+        }else blocked.setVisibility(View.VISIBLE);
+
+        if (checkTaskCompleted(dataSet.get(position).getTasksCompleted(), dataSet.get(position).getId())){
             completed.setVisibility(View.VISIBLE);
             xp.setVisibility(View.GONE);
+        }else{
+            completed.setVisibility(View.GONE);
+            xp.setVisibility(View.VISIBLE);
         }
 
     }
 
+    private boolean checkTaskCompleted(ArrayList<String> tasksCompleted, String idTask){
+        for (int i = 0; i<tasksCompleted.size(); i++){
+            if (tasksCompleted.get(i).equals(idTask)) return true;
+        }
+        return false;
+    }
 
 
     @Override

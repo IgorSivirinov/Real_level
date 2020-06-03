@@ -19,22 +19,43 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginAndRegistration.LoginActivity" />
-        <activity android:name=".LoginAndRegistration.RegistrationActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".StartActivity">
+        <activity android:name=".ui.community.UserActivity"></activity>
+        <activity
+            android:name=".LoginAndRegistration.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginAndRegistration.RegistrationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".StartActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.tasks.TaskActivity" />
-        <activity android:name=".ui.tasks.NewTaskActivity" />
-        <activity android:name=".ui.tasks.AddNewTaskTypeActivity" />
-        <activity android:name=".ui.home.SettingsActivity" />
-        <activity android:name=".ui.home.Act.listAct.NameNewActivity" />
-        <activity android:name=".ui.home.Act.listAct.EmailNewActivity" />
+        <activity
+            android:name=".ui.tasks.TaskActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.tasks.NewTaskActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.tasks.AddNewTaskTypeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.home.SettingsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.home.Act.listAct.NameNewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.home.Act.listAct.EmailNewActivity"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -54,7 +54,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет что-то пишет"/>
-
+<LinearLayout
+    android:id="@+id/ll_acts_layout_card_task_completed"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
                 <View
                     android:id="@+id/divider"
                     android:layout_width="match_parent"
@@ -80,6 +84,7 @@
                         android:src="@drawable/ic_additional_actions" />
                 </LinearLayout>
                 </LinearLayout>
+            </LinearLayout>
             </LinearLayout>
     </androidx.cardview.widget.CardView>
 

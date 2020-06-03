@@ -36,8 +36,7 @@ public class TaskCompletedTapeFragment extends Fragment {
 
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private Query taskCompletedSort;
-    private User user;
-    private ProgressBar pdLoadingTaskCompleted;
+    private ProgressBar pbLoadingTaskCompleted;
     private SwipeRefreshLayout srlRecyclerViewUsers;
     private RecyclerView.Adapter adapter;
     private static RecyclerView recyclerViewTaskCompleted;
@@ -67,6 +66,11 @@ public class TaskCompletedTapeFragment extends Fragment {
                         addTaskCompletedToList();
                     }
                 }
+                if (dy > 0) {
+                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) > layoutManager.getItemCount()) {
+                        pbLoadingTaskCompleted.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         });
         return root;
@@ -81,7 +85,7 @@ public class TaskCompletedTapeFragment extends Fragment {
     private void init(){
         taskCompletedSort = firestore.collection("taskCompletedTape").orderBy("time", Query.Direction.DESCENDING);
         srlRecyclerViewUsers = root.findViewById(R.id.swipeRefreshLayout_fragment_task_completed_tape);
-        pdLoadingTaskCompleted = root.findViewById(R.id.pb_taskCompletedLoading_fragment_task_completed_tape);
+        pbLoadingTaskCompleted = root.findViewById(R.id.pb_taskCompletedLoading_fragment_task_completed_tape);
         recyclerViewTaskCompleted = root.findViewById(R.id.rv_taskCompleted_fragment_task_completed_tape);
         recyclerViewTaskCompleted.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getContext(), 1);
@@ -94,7 +98,6 @@ public class TaskCompletedTapeFragment extends Fragment {
     private DocumentSnapshot lastVisible;
     private void updateTaskCompletedList(){
         data.clear();
-        pdLoadingTaskCompleted.setVisibility(View.VISIBLE);
         taskCompletedSort.limit(10).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -109,7 +112,7 @@ public class TaskCompletedTapeFragment extends Fragment {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        pdLoadingTaskCompleted.setVisibility(View.GONE);
+                        pbLoadingTaskCompleted.setVisibility(View.GONE);
                         adapter = new CustomAdapterTaskCompleted(data);
                         srlRecyclerViewUsers.setRefreshing(false);
                         recyclerViewTaskCompleted.setAdapter(adapter);
@@ -119,9 +122,8 @@ public class TaskCompletedTapeFragment extends Fragment {
     }
 
     private void addTaskCompletedToList(){
-        pdLoadingTaskCompleted.setVisibility(View.VISIBLE);
         taskCompletedSort.startAfter(lastVisible)
-                .limit(3).get()
+                .limit(2).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -131,12 +133,12 @@ public class TaskCompletedTapeFragment extends Fragment {
                         try {
                             lastVisible = queryDocumentSnapshots.getDocuments()
                                     .get(queryDocumentSnapshots.size() - 1);
-
+                            adapter.notifyDataSetChanged();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        pdLoadingTaskCompleted.setVisibility(View.GONE);
-                        adapter.notifyDataSetChanged();
+                        pbLoadingTaskCompleted.setVisibility(View.GONE);
+
                     }
                 });
     }

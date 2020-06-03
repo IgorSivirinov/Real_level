@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskCompletedTapeFS;
@@ -23,16 +25,21 @@ import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTask;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 
 public class TaskActivity extends AppCompatActivity {
+
+    private OnTaskCompletedListener onTaskCompletedListener;
+    private TextInputLayout tilComment;
     private Button bCompleted, bDelete;
     private ImageButton ibBack;
     private TextView name, overview;
@@ -40,6 +47,8 @@ public class TaskActivity extends AppCompatActivity {
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private User user;
     private DataModelTask task;
+    private int taskId;
+    private String comment;
     private Gson gson = new Gson();
     private SharedPreferences sharedPreferences;
     @Override
@@ -52,9 +61,10 @@ public class TaskActivity extends AppCompatActivity {
 
         if (user.isAdmin()) bDelete.setVisibility(View.VISIBLE);
 
-        if (task.isCompleted()){
+        if (checkTaskCompleted(task.getTasksCompleted(), task.getId())){
             bCompleted.setVisibility(View.GONE);
             ivTaskComplete.setVisibility(View.VISIBLE);
+            tilComment.setVisibility(View.INVISIBLE);
         }
 
         ibBack.setOnClickListener(new View.OnClickListener() {
@@ -79,29 +89,35 @@ public class TaskActivity extends AppCompatActivity {
 
                 firestore.collection("taskCompletedTape")
                         .add(new TaskCompletedTapeFS(
-                                new TaskFS(task.getName(),null,null,    task.getXp(), 0),
+                                new TaskFS(task.getName(),task.getOverview(),task.getType(),    task.getXp(), task.getMinLevel()),
                                 user,
-                                null,
+                                tilComment.getEditText().getText().toString().trim(),
                                 new Timestamp(new Date())))
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         firestore.collection("users").document(user.getIdUser())
-                                .update("tasksCompleted", FieldValue.arrayUnion(task.getId()));
-                        firestore.collection("users").document(user.getIdUser())
-                                .update("xp", user.getXp()+task.getXp());
+                                .update("xp", user.getXp()+task.getXp(),
+                                        "tasksCompleted", FieldValue.arrayUnion(task.getId()));
+                        firestore.collection("users").document(user.getIdUser()).collection("history")
+                                .add(new TaskCompletedTapeFS(
+                                new TaskFS(task.getName(),task.getOverview(),task.getType(),    task.getXp(), task.getMinLevel()),
+                                user,
+                                tilComment.getEditText().getText().toString().trim(),
+                                new Timestamp(new Date())));
                         SharedPreferences.Editor editorUser = sharedPreferences.edit();
                         editorUser.putString(user.APP_PREFERENCES_USER, gson.toJson(user));
                         editorUser.apply();
+                        onTaskCompletedListener.onTaskCompletedListener();
                         finish();
                     }
                 });
             }
         });
     }
-    private void init(){
+    private void init() {
         sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
-        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER, ""), User.class);
 
         name = findViewById(R.id.nameTask_activity_task);
         overview = findViewById(R.id.overviewTask_activity_task);
@@ -110,8 +126,20 @@ public class TaskActivity extends AppCompatActivity {
         ibBack = findViewById(R.id.ib_back_toolbar_activity_task);
         bCompleted = findViewById(R.id.b_task_completed_activity_task);
         bDelete = findViewById(R.id.b_deleteTask_activity_task);
-
         task = gson.fromJson(getIntent().getStringExtra("task"), DataModelTask.class);
+
+        tilComment = findViewById(R.id.til_comment_activity_task);
+
+
+
+        Fragment fragment = new TasksFragment();
+
+            if (fragment instanceof OnTaskCompletedListener) {
+                onTaskCompletedListener = (OnTaskCompletedListener) fragment;
+            } else {
+                throw new RuntimeException(fragment.toString()
+                        + " must implement onActivityDataListener");
+            }
     }
 
     private void startDialogDeleteWarning(){
@@ -148,5 +176,15 @@ public class TaskActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private boolean checkTaskCompleted(ArrayList<String> tasksCompleted, String idTask){
+        for (int i = 0; i<tasksCompleted.size(); i++){
+            if (tasksCompleted.get(i).equals(idTask)) return true;
+        }
+        return false;
+    }
+
+    public interface OnTaskCompletedListener {
+        void onTaskCompletedListener();
+    }
 
 }

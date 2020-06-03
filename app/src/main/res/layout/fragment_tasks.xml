@@ -78,11 +78,10 @@
                     android:id="@+id/pb_tasksTape_fragment_tasks"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:layout_gravity="center" />
             </LinearLayout>
         </FrameLayout>
-
             </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_newTask_fragment_task"

@@ -8,7 +8,7 @@ public class User extends UserFS {
     private String idUser;
 
 
-
+    public User(){}
     public User(String idUser, String email, UserFS userFS) {
         super(userFS.getUserAvatar(),userFS.getName(), userFS.getXp(),
                 userFS.isAdmin(), userFS.isWriter(),
