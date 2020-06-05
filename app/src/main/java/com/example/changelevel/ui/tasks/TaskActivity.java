@@ -38,7 +38,7 @@ import java.util.Date;
 
 public class TaskActivity extends AppCompatActivity {
 
-    private OnTaskCompletedListener onTaskCompletedListener;
+
     private TextInputLayout tilComment;
     private Button bCompleted, bDelete;
     private ImageButton ibBack;
@@ -59,7 +59,7 @@ public class TaskActivity extends AppCompatActivity {
         name.setText(task.getName());
         overview.setText(task.getOverview());
 
-        if (user.isAdmin()) bDelete.setVisibility(View.VISIBLE);
+        if (user.isAdmin()||(user.isWriter()&&checkYouCreateIt())) bDelete.setVisibility(View.VISIBLE);
 
         if (checkTaskCompleted(task.getTasksCompleted(), task.getId())){
             bCompleted.setVisibility(View.GONE);
@@ -89,10 +89,12 @@ public class TaskActivity extends AppCompatActivity {
 
                 firestore.collection("taskCompletedTape")
                         .add(new TaskCompletedTapeFS(
-                                new TaskFS(task.getName(),task.getOverview(),task.getType(),    task.getXp(), task.getMinLevel()),
+                                new TaskFS(task.getName(),task.getOverview(),task.getType(), task.getXp(), task.getMinLevel()
+                                        , new Timestamp(new Date())),
                                 user,
                                 tilComment.getEditText().getText().toString().trim(),
-                                new Timestamp(new Date())))
+                                new Timestamp(new Date()),
+                                new ArrayList<String>()))
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
@@ -101,14 +103,16 @@ public class TaskActivity extends AppCompatActivity {
                                         "tasksCompleted", FieldValue.arrayUnion(task.getId()));
                         firestore.collection("users").document(user.getIdUser()).collection("history")
                                 .add(new TaskCompletedTapeFS(
-                                new TaskFS(task.getName(),task.getOverview(),task.getType(),    task.getXp(), task.getMinLevel()),
+                                new TaskFS(task.getName(),task.getOverview(),task.getType(),    task.getXp(), task.getMinLevel()
+                                        ,new Timestamp(new Date())),
                                 user,
                                 tilComment.getEditText().getText().toString().trim(),
-                                new Timestamp(new Date())));
+                                new Timestamp(new Date()),
+                                        new ArrayList<String>()));
                         SharedPreferences.Editor editorUser = sharedPreferences.edit();
                         editorUser.putString(user.APP_PREFERENCES_USER, gson.toJson(user));
                         editorUser.apply();
-                        onTaskCompletedListener.onTaskCompletedListener();
+
                         finish();
                     }
                 });
@@ -129,17 +133,6 @@ public class TaskActivity extends AppCompatActivity {
         task = gson.fromJson(getIntent().getStringExtra("task"), DataModelTask.class);
 
         tilComment = findViewById(R.id.til_comment_activity_task);
-
-
-
-        Fragment fragment = new TasksFragment();
-
-            if (fragment instanceof OnTaskCompletedListener) {
-                onTaskCompletedListener = (OnTaskCompletedListener) fragment;
-            } else {
-                throw new RuntimeException(fragment.toString()
-                        + " must implement onActivityDataListener");
-            }
     }
 
     private void startDialogDeleteWarning(){
@@ -183,8 +176,13 @@ public class TaskActivity extends AppCompatActivity {
         return false;
     }
 
-    public interface OnTaskCompletedListener {
-        void onTaskCompletedListener();
+    private boolean checkYouCreateIt(){
+        ArrayList<String> createdTasks = user.getCreatedTasks();
+        for (String id : createdTasks){
+            if (id == task.getId()) return true;
+        }
+        return false;
     }
+
 
 }

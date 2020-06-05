@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -42,7 +43,8 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class TasksFragment extends Fragment implements TaskActivity.OnTaskCompletedListener{
+public class TasksFragment extends Fragment
+        implements PopupMenu.OnMenuItemClickListener{
 
     private RecyclerView.Adapter adapter;
     private static RecyclerView recyclerView;
@@ -73,7 +75,7 @@ public class TasksFragment extends Fragment implements TaskActivity.OnTaskComple
 
         init();
 
-        if(user.isAdmin()||user.isWriter()){
+        if(user.isWriter()){
             fabStartNewTaskActivity.setVisibility(View.VISIBLE);
             fabStartNewTaskActivity.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -136,17 +138,14 @@ public class TasksFragment extends Fragment implements TaskActivity.OnTaskComple
         progressBar_tasksTape = root.findViewById(R.id.pb_tasksTape_fragment_tasks);
         imageButtonFiltersFragmentHome = root.findViewById(R.id.imageButton_filters_fragment_home);
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout_fragment_tasks);
-        updateTasksList();
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        if(isUpdateTaskList){
             updateTasksList();
-            isUpdateTaskList = false;
-        }
+
         if (isUpdateChips) {
             startBottomSheetDialog();
             isUpdateChips = false;
@@ -159,11 +158,7 @@ public class TasksFragment extends Fragment implements TaskActivity.OnTaskComple
         user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
     }
 
-    @Override
-    public void onTaskCompletedListener() {
-        isUpdateTaskList = true;
-        Log.d("TasksFragment", "onTaskCompletedListener");
-    }
+
 
 
     private class MyOnClickListener implements View.OnClickListener {
@@ -266,41 +261,46 @@ public class TasksFragment extends Fragment implements TaskActivity.OnTaskComple
 
 
 
-    private Chip chip;
-    private ArrayList<Chip> chips = new ArrayList<Chip>();
     private ChipGroup chipGroup;
-    private ProgressBar progressLoading;
     private BottomSheetDialog dialog;
     public void startBottomSheetDialog(){
         dialog = new BottomSheetDialog(getContext());
         View view = getLayoutInflater().inflate(R.layout.filters_task_list_dialog_bottom_sheet_fragment, null);
-        progressLoading = view.findViewById(R.id.pb_loading_bottom_sheet_filters);
         chipGroup = view.findViewById(R.id.cg_taskType_bottom_sheet_filters);
         ibAddTaskType = view.findViewById(R.id.ib_addTaskType_bottom_sheet_filters);
+        if (user.isAdmin()) ibAddTaskType.setVisibility(View.VISIBLE);
         dialog.setContentView(view);
         updateChips();
-
-        chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(ChipGroup group, int checkedId) {
-                Chip chip = chipGroup.findViewById(checkedId);
-                if (chip!=null) {
-                    if (chip.getText().toString().equals("Все"))
-                        taskSort = firestore.collection("tasks");
-                    else
-                        taskSort = firestore.collection("tasks").whereEqualTo("taskType", chip.getText().toString());
-                }else taskSort = firestore.collection("tasks").whereLessThanOrEqualTo("minLevel", user.checkLevel());
-                updateTasksList();
-            }
-        });
         dialog.show();
 
 
     }
 
     private void updateChips(){
-        progressLoading.setVisibility(View.GONE);
-        addChipFilter("Все");
+        Chip chip2 = (Chip) getLayoutInflater().inflate(R.layout.chip_task_type,
+                null, false);
+        chip2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                taskSort = firestore.collection("tasks").whereLessThanOrEqualTo("minLevel", user.checkLevel());
+                updateTasksList();
+            }
+        });
+        chip2.setText("Все доступные");
+        chipGroup.addView(chip2);
+
+
+        Chip chip1 = (Chip) getLayoutInflater().inflate(R.layout.chip_task_type,
+                null, false);
+        chip1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                taskSort = firestore.collection("tasks").orderBy("time", Query.Direction.DESCENDING);
+                updateTasksList();
+            }
+        });
+        chip1.setText("Все");
+        chipGroup.addView(chip1);
         firestore.collection("taskTypes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -308,35 +308,46 @@ public class TasksFragment extends Fragment implements TaskActivity.OnTaskComple
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                addChipFilter(document.toObject(TaskTypeFS.class).getNameType());
+                                addChipFilter(document.toObject(TaskTypeFS.class).getNameType(), document.getId());
                             }
-                            stopLoading();
-
                         }
                     }
                 });
     }
 
-    private void addChipFilter(String name){
-        chip = (Chip) getLayoutInflater().inflate(R.layout.chip_task_type,
+    private void addChipFilter(final String name, final String id){
+        final Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_task_type,
                 null, false);
+        chip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                taskSort = firestore.collection("tasks").whereEqualTo("taskType", name);
+                updateTasksList();
+            }
+        });
+        chip.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                PopupMenu popup = new PopupMenu(getContext(),v);
+                popup.setOnMenuItemClickListener(TasksFragment.this);
+                popup.inflate(R.menu.menu_delete);
+                popup.show();
+                whatToDeleteChip = id;
+                return false;
+            }
+        });
         chip.setText(name);
         chipGroup.addView(chip);
     }
-
-    private void stopLoading(){
-        chipGroup.setVisibility(View.VISIBLE);
-        if(user.isAdmin()){
-            ibAddTaskType.setVisibility(View.VISIBLE);
-            ibAddTaskType.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    isUpdateChips = true;
-                    Intent intent = new Intent(getActivity(), AddNewTaskTypeActivity.class);
-                    dialog.dismiss();
-                    startActivity(intent);
-                }
-            });
+    private String whatToDeleteChip;
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId()==R.id.delete_menu_delete){
+            firestore.collection("taskTypes").document(whatToDeleteChip).delete();
+            updateChips();
+            return true;
         }
+        return false;
     }
+
 }

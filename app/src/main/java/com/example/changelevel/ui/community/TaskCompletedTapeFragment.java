@@ -42,6 +42,7 @@ public class TaskCompletedTapeFragment extends Fragment {
     private static RecyclerView recyclerViewTaskCompleted;
     private LinearLayoutManager layoutManager;
     private static ArrayList<DataModelTaskCompletedTape> data;
+    private boolean isAddTask = true;
 
     View root;
     @Override
@@ -63,7 +64,10 @@ public class TaskCompletedTapeFragment extends Fragment {
                 if (dy > 0) {
                     if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition())
                             >= layoutManager.getItemCount()-3) {
-                        addTaskCompletedToList();
+                        if (isAddTask) {
+                            isAddTask = false;
+                            addTaskCompletedToList();
+                        }
                     }
                 }
                 if (dy > 0) {
@@ -138,6 +142,7 @@ public class TaskCompletedTapeFragment extends Fragment {
                             e.printStackTrace();
                         }
                         pbLoadingTaskCompleted.setVisibility(View.GONE);
+                        isAddTask = true;
 
                     }
                 });

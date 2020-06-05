@@ -7,7 +7,7 @@ public class DataModelTaskCompletedTape extends TaskCompletedTapeFS {
 
 
     public DataModelTaskCompletedTape(String id, TaskCompletedTapeFS taskCompletedTapeFS) {
-        super(taskCompletedTapeFS.getTask(), taskCompletedTapeFS.getUser(), taskCompletedTapeFS.getComment(),taskCompletedTapeFS.getTime());
+        super(taskCompletedTapeFS.getTask(), taskCompletedTapeFS.getUser(), taskCompletedTapeFS.getComment(),taskCompletedTapeFS.getTime(), taskCompletedTapeFS.getComplainingUsersId());
         this.id = id;
     }
 

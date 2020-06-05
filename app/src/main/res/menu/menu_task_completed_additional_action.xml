@@ -6,10 +6,6 @@
         android:id="@+id/delete_menu_task_completed_additional_action"
         android:title="Удалить" />
     <item
-        android:visible="false"
-        android:id="@+id/fine_menu_task_completed_additional_action"
-        android:title="Оштрафовать" />
-    <item
         android:title="Жалоба">
         <menu>
             <item
@@ -18,6 +14,9 @@
             <item
                 android:id="@+id/profanity_complaint_menu_task_completed_additional_action"
                 android:title="Нецензурная лексика" />
+            <item
+                android:id="@+id/advertising_complaint_menu_task_completed_additional_action"
+                android:title="Реклама" />
         </menu>
     </item>
 </menu>

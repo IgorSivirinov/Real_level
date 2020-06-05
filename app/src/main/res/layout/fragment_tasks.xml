@@ -25,13 +25,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <SearchView
-                    android:id="@+id/searchView2"
-                    style="@style/Widget.AppCompat.SearchView.ActionBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/imageButton_filters_fragment_home" />
 
                 <ImageButton
                     android:id="@+id/imageButton_filters_fragment_home"

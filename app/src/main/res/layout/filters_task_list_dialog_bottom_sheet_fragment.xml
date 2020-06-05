@@ -10,11 +10,7 @@
     android:background="#ffffff"
     android:orientation="vertical">
 
-    <ProgressBar
-        android:id="@+id/pb_loading_bottom_sheet_filters"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"/>
+
     <ImageButton
         android:id="@+id/ib_addTaskType_bottom_sheet_filters"
         android:background="@drawable/ripple_null_background_round"
@@ -26,12 +22,10 @@
         android:src="@drawable/ic_add"/>
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/cg_taskType_bottom_sheet_filters"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:layout_marginBottom="34dp"
-            android:visibility="gone"
             app:singleSelection="true"/>
 
 

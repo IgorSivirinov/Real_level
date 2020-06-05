@@ -2,6 +2,9 @@ package com.example.changelevel.ui.community;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -173,13 +176,15 @@ public class UsersFragment extends Fragment {
             int selectedItemPosition = recyclerViewUsers.getChildPosition(view);
             RecyclerView.ViewHolder viewHolder = recyclerViewUsers.findViewHolderForPosition(selectedItemPosition);
             User user = UsersFragment.data.get(selectedItemPosition);
-            Intent intent = new Intent(context, UserActivity.class);
-            intent.putExtra("user", gson.toJson(user));
-            context.startActivity(intent);
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            if (activeNetwork.isConnectedOrConnecting()) {
+                Intent intent = new Intent(context, UserActivity.class);
+                intent.putExtra("user", gson.toJson(user));
+                context.startActivity(intent);
+            }else Toast.makeText(context, "Слабое подключение к интернету", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void dialog(){
 
-    }
 }

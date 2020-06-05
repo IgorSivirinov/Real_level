@@ -32,33 +32,33 @@ public class MainActivity extends AppCompatActivity{
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
 
-        updateUser();
-        firestore.collection("users").document(mUser.getIdUser())
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        if(documentSnapshot != null && documentSnapshot.exists()) {
-                            User user = new User(mUser.getIdUser(), mUser.getEmail(), documentSnapshot.toObject(UserFS.class));
-                            Gson gson = new Gson();
-                            SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
-                            SharedPreferences.Editor editorUser = sharedPreferences.edit();
-                            editorUser.putString(user.APP_PREFERENCES_USER, gson.toJson(user));
-                            editorUser.apply();
-                            Log.d("MainActivity", "User update");
-                        }
-                    }
-                });
-
+//        updateUser();
+//        firestore.collection("users").document(mUser.getIdUser())
+//                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+//                        if(documentSnapshot != null && documentSnapshot.exists()) {
+//                            User user = new User(mUser.getIdUser(), mUser.getEmail(), documentSnapshot.toObject(UserFS.class));
+//                            Gson gson = new Gson();
+//                            SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
+//                            SharedPreferences.Editor editorUser = sharedPreferences.edit();
+//                            editorUser.putString(user.APP_PREFERENCES_USER, gson.toJson(user));
+//                            editorUser.apply();
+//                            Log.d("MainActivity", "User update");
+//                        }
+//                    }
+//                });
+//
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
 
 
     }
-    private void updateUser(){
-        Gson gson = new Gson();
-        SharedPreferences sharedPreferences = getSharedPreferences(mUser.APP_PREFERENCES_USER, MODE_PRIVATE);
-        mUser = gson.fromJson(sharedPreferences.getString(mUser.APP_PREFERENCES_USER,""), User.class);
-    }
+//    private void updateUser(){
+//        Gson gson = new Gson();
+//        SharedPreferences sharedPreferences = getSharedPreferences(mUser.APP_PREFERENCES_USER, MODE_PRIVATE);
+//        mUser = gson.fromJson(sharedPreferences.getString(mUser.APP_PREFERENCES_USER,""), User.class);
+//    }
     @Override
     public void onBackPressed() {
         finishAffinity();

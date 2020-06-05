@@ -48,30 +48,76 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
+        android:background="@color/Gray"
         android:elevation="4dp">
 
         <ImageButton
             android:id="@+id/icon_user_activity_settings"
-            android:layout_width="100dp"
-            android:layout_height="100dp"/>
-<!--            android:background="@drawable/imagestest"-->
-
-
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:background="@color/Gray"
+            android:scaleType="centerCrop"/>
     </com.github.florent37.shapeofview.shapes.CircleView>
     <TextView
-        android:id="@+id/name_settings"
+        android:id="@+id/name_activity_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="TestUserName"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textColor="@color/darkGray"/>
 
-
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_act"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
+<TextView
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:text="Писать на почту или в телеграм канал" />
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="по багам, вапросам или для полученя статуса админа/писателя"
+            />
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:autoLink="email"
+            android:layout_marginTop="16dp"
+            android:text="Почта: reallevelsupport@googlegroups.com"
+            />
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:autoLink="web"
+            android:text="Tekegram канал: https://t.me/joinchat/AAAAAEp7LMgJZ1rBdkHbnQ" />
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:text="Программа создана Игорем Сивириновым как проект выпускника IT ШКОЛЫ SAMSUNG"
+            />
+    </LinearLayout>
+</ScrollView>
 
 </LinearLayout>

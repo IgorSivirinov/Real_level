@@ -4,10 +4,12 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -22,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,6 +34,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.CustomAdapters.CustomAdapterListAct;
 import com.example.changelevel.LoginAndRegistration.LoginActivity;
 import com.example.changelevel.R;
@@ -48,6 +52,12 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,19 +73,21 @@ public class SettingsActivity extends AppCompatActivity {
     private Button signOutButton;
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
-    private final int CAMERA_CAPTURE = 5;
-    private Uri picUri;
-    private final int PICK_IMAGE_REQUEST = 6;
-    private final int PIC_CROP = 2;
-    final int CAMERA_REQUEST = 1;
-    private static final int REQUEST_TAKE_PHOTO = 4;
-    private String mCurrentPhotoPath;
+    private final int GALLERY_REQUEST = 2;
+    private final int CODE_IMG_GALLERY = 1;
+    private final String  SAMPLE_CROPPED_IMG_NAME = "SampleCropImg";
     private Uri photoURI;
     private ImageButton imageButtonBack;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<DataModelListAct> data;
     private RecyclerView.Adapter adapter;
 
+    StorageReference riversRef;
+    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+    private StorageReference mStorageRef;
+
+    private Gson gson = new Gson();
+    private User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +111,9 @@ public class SettingsActivity extends AppCompatActivity {
         imageButtonUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogNewIconUser();
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
             }
         });
 
@@ -115,9 +129,14 @@ public class SettingsActivity extends AppCompatActivity {
     }
     private void init(){
 
+
+        mStorageRef = FirebaseStorage.getInstance().getReference("users_avatar");
+        updateUser();
         imageButtonUser = findViewById(R.id.icon_user_activity_settings);
         imageButtonBack = findViewById(R.id.imageButton_back_toolbar_activity_settings);
         signOutButton = findViewById(R.id.b_signOut_activity_settings);
+        TextView name = findViewById(R.id.name_activity_settings);
+        name.setText(user.getName());
         recyclerView=findViewById(R.id.recycler_view_act);
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(this, 1);
@@ -125,6 +144,12 @@ public class SettingsActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         data = new ArrayList<DataModelListAct>();
         myOnClickListener=new MyOnClickListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateIconUser();
     }
 
     private void signOut() {
@@ -344,114 +369,99 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    private  void dialogNewIconUser(){
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setContentView(R.layout.dialog_icon_user_new);
-
-        ListView listView = dialog.findViewById(R.id.listView_dialog_icon_user_new);
-        final String[] act = new String[]{"Сделать снимок","Выбрать фото"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,act);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private void updateIconUser(){
+        if(user.getUserAvatar()!=null)
+            mStorageRef.child(user.getUserAvatar()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch ((int)id){
-                    case 0:
-                        try {
-                            // Намерение для запуска камеры
-                            Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(captureIntent, CAMERA_REQUEST);
-                        } catch (ActivityNotFoundException e) {
-                            // Выводим сообщение об ошибке
-                            String errorMessage = "Ваше устройство не поддерживает съемку";
-                            Toast toast = Toast
-                                    .makeText(SettingsActivity.this, errorMessage, Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-
-                        break;
-                    case 1:
-                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        photoPickerIntent.setType("image/*");
-                        startActivityForResult(photoPickerIntent, PICK_IMAGE_REQUEST);
-                        break;
-                }
+            public void onSuccess(Uri uri) {
+                Picasso.with(getBaseContext())
+                        .load(uri)
+                        .into(imageButtonUser);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(SettingsActivity.this, "Ошибка", Toast.LENGTH_LONG).show();
             }
         });
-        dialog.show();
-
     }
 
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+    private void newIconUser(final Uri uri){
 
-        String mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
+            riversRef = mStorageRef.child(user.getIdUser().toLowerCase() + user.getName().toLowerCase() + ".jpg");
+            riversRef.putFile(uri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            firestore.collection("users").document(user.getIdUser())
+                                    .update("userAvatar", user.getIdUser().toLowerCase() + user.getName().toLowerCase() + ".jpg")
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            user.setUserAvatar(user.getIdUser().toLowerCase() + user.getName().toLowerCase() + ".jpg");
+                                            SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
+                                            SharedPreferences.Editor editorUser = sharedPreferences.edit();
+                                            editorUser.putString(user.APP_PREFERENCES_USER, gson.toJson(user));
+                                            editorUser.apply();
+                                            updateIconUser();
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    Toast.makeText(SettingsActivity.this, "Ошибка", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Toast.makeText(SettingsActivity.this, "Ошибка", Toast.LENGTH_LONG).show();
+                        }
+                    });
+//        }
     }
+
 
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            // Вернулись от приложения Камера
-            if (requestCode == CAMERA_REQUEST) {
-                // Получим Uri снимка
-                picUri = data.getData();
-                // кадрируем его
-                performCrop();
-            }
-            // Вернулись из операции кадрирования
-            else if(requestCode == PIC_CROP){
-                Bundle extras = data.getExtras();
-                // Получим кадрированное изображение
-                Bitmap thePic = extras.getParcelable("data");
-                // передаём его в ImageView
-                imageButtonUser.setImageBitmap(thePic);
-            }
+        if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK){
+            Uri imageUri= data.getData();
+
+            if (imageUri!=null)
+                startCrop(imageUri);
+
+        }else if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK){
+            Uri imageUriResultCrop = UCrop.getOutput(data);
+
+            if(imageUriResultCrop!=null)
+            newIconUser(imageUriResultCrop);
         }
-//        if (resultCode == RESULT_OK) {
-//            if(requestCode == CAMERA_CAPTURE){
-//                picUri = data.getData();
-//                performCrop();
-//            }else if(requestCode == PIC_CROP){
-//                Bundle extras = data.getExtras();
-//                Bitmap thePic = (Bitmap) extras.get("data");
-//                imageButtonUser.setImageBitmap(thePic);
-//            }else if(requestCode == PICK_IMAGE_REQUEST){
-//                picUri= data.getData();
-//                performCrop();
-//            }
-//        }
+
     }
 
-    private void performCrop(){
-        try {
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            cropIntent.setDataAndType(picUri, "image/*");
-            cropIntent.putExtra("crop", "true");
-            cropIntent.putExtra("aspectX", 1);
-            cropIntent.putExtra("aspectY", 1);
-            cropIntent.putExtra("outputX", 256);
-            cropIntent.putExtra("outputY", 256);
-            cropIntent.putExtra("return-data", true);
-            startActivityForResult(cropIntent, PIC_CROP);
-        }
-        catch(ActivityNotFoundException anfe){
-            //display an error message
-            String errorMessage = "Whoops - your device doesn't support the crop action!";
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
-        }
+    private void startCrop(@NonNull Uri uri){
+        String destinationFileName = SAMPLE_CROPPED_IMG_NAME;
+        destinationFileName +=".jpg";
+
+        UCrop uCrop = UCrop.of(uri, Uri.fromFile(new File(getCacheDir(), destinationFileName)));
+        uCrop.withAspectRatio(1,1);
+        uCrop.withOptions(getUCropOptions());
+        uCrop.start(SettingsActivity.this);
     }
 
+    private UCrop.Options getUCropOptions(){
+        UCrop.Options options = new UCrop.Options();
+        options.setStatusBarColor(Color.WHITE);
+        options.setToolbarColor(Color.WHITE);
+        return  options;
+    }
+
+    private void updateUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+    }
 }

@@ -25,7 +25,7 @@ public class CustomAdapterHistory extends RecyclerView.Adapter<CustomAdapterHist
     @NonNull
     @Override
     public CustomAdapterHistory.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_card_task_completed, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_card_me_history, parent, false);
         CustomAdapterHistory.MyViewHolder myViewHolder = new CustomAdapterHistory.MyViewHolder(view);
         return myViewHolder;
     }
@@ -36,21 +36,13 @@ public class CustomAdapterHistory extends RecyclerView.Adapter<CustomAdapterHist
 
     @Override
     public void onBindViewHolder(@NonNull CustomAdapterHistory.MyViewHolder holder, int position) {
-        TextView nameTask, nameUser, plusXpUser, userComments;
-        ImageButton additionalAction;
+        TextView nameTask, plusXpUser, userComments;
 
-
-
-        LinearLayout llActs = holder.llActs;
         nameTask = holder.nameTask;
-        nameUser = holder.nameUser;
         plusXpUser = holder.plusXpUser;
         userComments = holder.userComments;
 
-        llActs.setVisibility(View.GONE);
-
         nameTask.setText(dataSet.get(position).getTask().getTaskName());
-        nameUser.setText(dataSet.get(position).getUser().getName());
         plusXpUser.setText("+"+(int) dataSet.get(position).getTask().getTaskXP()+" XP");
         userComments.setText(dataSet.get(position).getComment());
 
@@ -64,18 +56,13 @@ public class CustomAdapterHistory extends RecyclerView.Adapter<CustomAdapterHist
 
     static class MyViewHolder extends RecyclerView.ViewHolder
     {
-        TextView nameTask, nameUser, plusXpUser, userComments;
-        ImageButton additionalAction;
-        LinearLayout llActs;
+        TextView nameTask, plusXpUser, userComments;
 
         MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.nameTask = itemView.findViewById(R.id.tv_nameTask_layout_card_task_completed);
-            this.nameUser = itemView.findViewById(R.id.tv_name_layout_card_task_completed);
-            this.plusXpUser = itemView.findViewById(R.id.tv_xp_layout_card_task_completed);
-            this.userComments = itemView.findViewById(R.id.tv_userComments_layout_card_task_completed);
-            this.additionalAction = itemView.findViewById(R.id.ib_additionalAction_layout_card_task_completed);
-            this.llActs = itemView.findViewById(R.id.ll_acts_layout_card_task_completed);
+            this.nameTask = itemView.findViewById(R.id.tv_nameTask_layout_card_me_history);
+            this.plusXpUser = itemView.findViewById(R.id.tv_xp_layout_card_me_history);
+            this.userComments = itemView.findViewById(R.id.tv_userComments_layout_card_me_history);
         }
     }
 

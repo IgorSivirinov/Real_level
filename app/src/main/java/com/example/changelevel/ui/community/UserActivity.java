@@ -1,5 +1,6 @@
 package com.example.changelevel.ui.community;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -9,29 +10,41 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskCompletedTapeFS;
 import com.example.changelevel.CustomAdapters.CustomAdapterHistory;
+import com.example.changelevel.CustomAdapters.CustomAdapterTaskCompleted;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTaskCompletedTape;
 import com.example.changelevel.ui.home.SettingsActivity;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends AppCompatActivity{
+    private static final String TAG = "UserActivity";
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private Query historySort;
     private ProgressBar pbLoadingHistory;
@@ -44,7 +57,9 @@ public class UserActivity extends AppCompatActivity {
     private TextView name_toolbar_home, tv_level;
     private ImageButton back;
     private User user;
+    private User iUser;
     private Gson gson = new Gson();
+    private boolean isAddTask = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +72,7 @@ public class UserActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         srlRecyclerViewHistory.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -71,7 +87,10 @@ public class UserActivity extends AppCompatActivity {
                 if (dy > 0) {
                     if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition())
                             >= layoutManager.getItemCount()-3) {
-                        addTaskHistory();
+                        if (isAddTask) {
+                            isAddTask = false;
+                            addTaskHistory();
+                        }
                     }
                 }
                 if (dy > 0) {
@@ -87,6 +106,7 @@ public class UserActivity extends AppCompatActivity {
 
 
     private void init(){
+        updateUser();
         user = gson.fromJson(getIntent().getStringExtra("user"), User.class);
         name_toolbar_home = findViewById(R.id.tv_name_activity_user);
         tv_level = findViewById(R.id.tv_level_activity_user);
@@ -102,6 +122,22 @@ public class UserActivity extends AppCompatActivity {
         recyclerViewHistory.setLayoutManager(layoutManager);
         recyclerViewHistory.setItemAnimator(new DefaultItemAnimator());
         data = new ArrayList<DataModelTaskCompletedTape>();
+        final ImageView iconUser = findViewById(R.id.iv_icon_user_activity_user);
+        StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("users_avatar");
+        if(user.getUserAvatar()!=null)
+            mStorageRef.child(user.getUserAvatar()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.with(UserActivity.this)
+                            .load(uri)
+                            .into(iconUser);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Toast.makeText(UserActivity.this, "Ошибка получения иконки", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
     private DocumentSnapshot lastVisible;
     private void updateTaskHistory(){
@@ -121,7 +157,11 @@ public class UserActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         pbLoadingHistory.setVisibility(View.GONE);
+
+                        if(iUser.getIdUser().equals(user.getIdUser()))
                         adapter = new CustomAdapterHistory(data);
+                        else adapter = new CustomAdapterTaskCompleted(data);
+
                         srlRecyclerViewHistory.setRefreshing(false);
                         recyclerViewHistory.setAdapter(adapter);
                     }
@@ -147,7 +187,7 @@ public class UserActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         pbLoadingHistory.setVisibility(View.GONE);
-
+                        isAddTask = true;
                     }
                 });
     }
@@ -160,4 +200,11 @@ public class UserActivity extends AppCompatActivity {
         tv_level.setText("Уровень "+user.checkLevel());
         updateTaskHistory();
     }
+
+    private void updateUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
+        iUser = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+    }
+
+
 }

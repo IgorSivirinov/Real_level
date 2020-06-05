@@ -1,5 +1,6 @@
 package com.example.changelevel.ui.tasks;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskFS;
 import com.example.changelevel.API.Firebase.Firestor.TaskTypeFS;
 import com.example.changelevel.R;
@@ -22,12 +24,16 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class NewTaskActivity extends AppCompatActivity {
     private TextInputLayout taskName, taskOverview,
@@ -39,6 +45,10 @@ public class NewTaskActivity extends AppCompatActivity {
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private ProgressBar progressBar;
     private ArrayList<String> taskTypes = new ArrayList<String>();
+
+    private User user;
+    private Gson gson = new Gson();
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +66,20 @@ public class NewTaskActivity extends AppCompatActivity {
                             taskOverview.getEditText().getText().toString().trim(),
                             nameTaskType.getEditText().getText().toString().trim(),
                             Integer.parseInt(taskXP.getEditText().getText().toString().trim()),
-                            Integer.parseInt(minLevelTaskType.getEditText().getText().toString().trim()));
+                            Integer.parseInt(minLevelTaskType.getEditText().getText().toString().trim()),
+                            new Timestamp(new Date()));
 
                     firestore.collection("tasks")
                             .add(taskFS).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
                             progressBar.setVisibility(View.INVISIBLE);
+                            firestore.collection("users").document(user.getIdUser())
+                                    .update("createdTasks", FieldValue.arrayUnion(documentReference.getId()));
+                            user.addCreatedTasks(documentReference.getId());
+                            SharedPreferences.Editor editorUser = sharedPreferences.edit();
+                            editorUser.putString(user.APP_PREFERENCES_USER, gson.toJson(user));
+                            editorUser.apply();
                             Toast.makeText(NewTaskActivity.this, "Задание опубликовано", Toast.LENGTH_LONG).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -95,6 +112,9 @@ public class NewTaskActivity extends AppCompatActivity {
         taskXP = findViewById(R.id.til_xpTask_activity_new_task);
         taskType = findViewById(R.id.actv_nameTaskType_activity_new_task);
         buttonSave = findViewById(R.id.b_saveTask_activity_new_task);
+
+        sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER, ""), User.class);
     }
 
     private void loadingTaskType(){
