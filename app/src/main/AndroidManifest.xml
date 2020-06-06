@@ -29,9 +29,6 @@
             android:name=".LoginAndRegistration.RegistrationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".StartActivity"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -41,10 +38,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.tasks.TaskActivity"
+            android:name=".ui.tasks.NewTaskActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.tasks.NewTaskActivity"
+            android:name=".ui.tasks.TaskActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.tasks.AddNewTaskTypeActivity"
@@ -62,6 +59,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.home.Act.listAct.EmailNewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait" />
 
         <provider

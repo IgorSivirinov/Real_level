@@ -3,33 +3,24 @@ package com.example.changelevel.ui.community;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.Toast;
-
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
-import com.example.changelevel.API.Firebase.Firestor.TaskFS;
 import com.example.changelevel.API.Firebase.Firestor.UserFS;
-import com.example.changelevel.CustomAdapters.CustomAdapterTask;
 import com.example.changelevel.CustomAdapters.CustomAdapterUser;
 import com.example.changelevel.R;
-import com.example.changelevel.models.DataModels.DataModelTask;
-import com.example.changelevel.ui.tasks.TaskActivity;
-import com.example.changelevel.ui.tasks.TasksFragment;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,7 +34,7 @@ import java.util.ArrayList;
 public class UsersFragment extends Fragment {
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private Query userSort;
-    private User user;
+
     private ProgressBar pbLoadingUser;
     private SwipeRefreshLayout srlRecyclerViewUsers;
     private RecyclerView.Adapter adapter;
@@ -90,12 +81,6 @@ public class UsersFragment extends Fragment {
         return root;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateUsersList();
-    }
-
     private void init(){
         userSort = firestore.collection("users").orderBy("xp", Query.Direction.DESCENDING);
         srlRecyclerViewUsers = root.findViewById(R.id.swipeRefreshLayout_fragment_users);
@@ -107,7 +92,7 @@ public class UsersFragment extends Fragment {
         recyclerViewUsers.setLayoutManager(layoutManager);
         recyclerViewUsers.setItemAnimator(new DefaultItemAnimator());
         data = new ArrayList<User>();
-
+        updateUsersList();
     }
 
     private DocumentSnapshot lastVisible;
@@ -173,16 +158,18 @@ public class UsersFragment extends Fragment {
         }
 
         private void removeItem(View view) {
-            int selectedItemPosition = recyclerViewUsers.getChildPosition(view);
-            RecyclerView.ViewHolder viewHolder = recyclerViewUsers.findViewHolderForPosition(selectedItemPosition);
-            User user = UsersFragment.data.get(selectedItemPosition);
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            if (activeNetwork.isConnectedOrConnecting()) {
-                Intent intent = new Intent(context, UserActivity.class);
-                intent.putExtra("user", gson.toJson(user));
-                context.startActivity(intent);
-            }else Toast.makeText(context, "Слабое подключение к интернету", Toast.LENGTH_LONG).show();
+            try {
+                int selectedItemPosition = recyclerViewUsers.getChildPosition(view);
+                RecyclerView.ViewHolder viewHolder = recyclerViewUsers.findViewHolderForPosition(selectedItemPosition);
+                User user = UsersFragment.data.get(selectedItemPosition);
+                ConnectivityManager cm = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                    Intent intent = new Intent(context, UserActivity.class);
+                    intent.putExtra("user", gson.toJson(user));
+                    context.startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -155,7 +155,7 @@ public class TasksFragment extends Fragment
     private void updateUser(){
         SharedPreferences sharedPreferences = getContext()
                 .getSharedPreferences(user.APP_PREFERENCES_USER, getContext().MODE_PRIVATE);
-        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""), User.class);
     }
 
 
@@ -174,14 +174,19 @@ public class TasksFragment extends Fragment
         }
 
         private void removeItem(View view) {
-            int selectedItemPosition = recyclerView.getChildPosition(view);
-            RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForPosition(selectedItemPosition);
-            DataModelTask task = TasksFragment.data.get(selectedItemPosition);
-            if (!task.isBlocked()) {
-                Intent intent = new Intent(context, TaskActivity.class);
-                intent.putExtra("task", gson.toJson(task));
-                context.startActivity(intent);
-            }else Toast.makeText(getContext(), "Вам нужно повысить уровень чтобы выполнить заданее", Toast.LENGTH_LONG);
+            try {
+                int selectedItemPosition = recyclerView.getChildPosition(view);
+                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForPosition(selectedItemPosition);
+                DataModelTask task = TasksFragment.data.get(selectedItemPosition);
+                if (!task.isBlocked()) {
+                    Intent intent = new Intent(context, TaskActivity.class);
+                    intent.putExtra("task", gson.toJson(task));
+                    context.startActivity(intent);
+                }else Toast.makeText(getContext(), "Вам нужно повысить уровень чтобы выполнить заданее", Toast.LENGTH_LONG);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
     }
@@ -190,7 +195,7 @@ public class TasksFragment extends Fragment
     private void updateTasksList(){
         updateUser();
         data.clear();
-        taskSort.limit(10).get()
+            taskSort.limit(10).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -220,12 +225,11 @@ public class TasksFragment extends Fragment
                         recyclerView.setAdapter(adapter);
                     }
                 });
-
-                    }
+        }
 
                     private void addTasksToList(){
                         updateUser();
-                        taskSort.startAfter(lastVisible)
+                            taskSort.startAfter(lastVisible)
                                 .limit(3).get()
                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                     @Override
@@ -268,7 +272,18 @@ public class TasksFragment extends Fragment
         View view = getLayoutInflater().inflate(R.layout.filters_task_list_dialog_bottom_sheet_fragment, null);
         chipGroup = view.findViewById(R.id.cg_taskType_bottom_sheet_filters);
         ibAddTaskType = view.findViewById(R.id.ib_addTaskType_bottom_sheet_filters);
-        if (user.isAdmin()) ibAddTaskType.setVisibility(View.VISIBLE);
+        if(user.isAdmin()){
+            ibAddTaskType.setVisibility(View.VISIBLE);
+            ibAddTaskType.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isUpdateChips = true;
+                    Intent intent = new Intent(getActivity(), AddNewTaskTypeActivity.class);
+                    dialog.dismiss();
+                    startActivity(intent);
+                }
+            });
+        }
         dialog.setContentView(view);
         updateChips();
         dialog.show();
@@ -342,9 +357,10 @@ public class TasksFragment extends Fragment
     private String whatToDeleteChip;
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        if (item.getItemId()==R.id.delete_menu_delete){
+        if (item.getItemId()== R.id.delete_menu_delete){
             firestore.collection("taskTypes").document(whatToDeleteChip).delete();
-            updateChips();
+            dialog.dismiss();
+            startBottomSheetDialog();
             return true;
         }
         return false;

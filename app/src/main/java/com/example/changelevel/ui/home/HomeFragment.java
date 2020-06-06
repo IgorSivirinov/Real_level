@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,10 +23,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskCompletedTapeFS;
 import com.example.changelevel.CustomAdapters.CustomAdapterHistory;
-import com.example.changelevel.CustomAdapters.CustomAdapterTaskCompleted;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTaskCompletedTape;
-import com.example.changelevel.ui.community.UserActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -126,12 +123,11 @@ public class HomeFragment extends Fragment {
         recyclerViewHistory.setItemAnimator(new DefaultItemAnimator());
         data = new ArrayList<DataModelTaskCompletedTape>();
 
-
     }
     private DocumentSnapshot lastVisible;
     private void updateTaskHistory(){
         data.clear();
-        historySort.limit(10).get()
+            historySort.limit(10).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -157,38 +153,39 @@ public class HomeFragment extends Fragment {
     }
 
     private void addTaskHistory(){
-        historySort.startAfter(lastVisible)
-                .limit(3).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            data.add(new DataModelTaskCompletedTape
-                                    (document.getId(),document.toObject(TaskCompletedTapeFS.class)));
+            historySort.startAfter(lastVisible)
+                    .limit(3).get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                data.add(new DataModelTaskCompletedTape
+                                        (document.getId(), document.toObject(TaskCompletedTapeFS.class)));
+                            }
+                            try {
+                                lastVisible = queryDocumentSnapshots.getDocuments()
+                                        .get(queryDocumentSnapshots.size() - 1);
+                                adapter.notifyDataSetChanged();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            pbLoadingHistory.setVisibility(View.GONE);
+                            isAddTask = true;
                         }
-                        try {
-                            lastVisible = queryDocumentSnapshots.getDocuments()
-                                    .get(queryDocumentSnapshots.size() - 1);
-                            adapter.notifyDataSetChanged();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        pbLoadingHistory.setVisibility(View.GONE);
-                        isAddTask = true;
-                    }
-                });
+                    });
     }
 
     private void updateUser(){
         Gson gson = new Gson();
         SharedPreferences sharedPreferences = getContext()
                 .getSharedPreferences(user.APP_PREFERENCES_USER, getContext().MODE_PRIVATE);
-        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""), User.class);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        updateUser();
         name_toolbar_home.setText(user.getName());
 
             tv_level.setText("Уровень " + user.checkLevel());
@@ -211,10 +208,11 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getContext(), "Ошибка получения иконки", Toast.LENGTH_SHORT).show();
                 }
             });
-
+        else iconUser.setImageResource(R.drawable.ic_user_start);
         progressBarXP.setMax(user.getMaxXp(user.checkLevel()));
         progressBarXP.setProgress((int) user.getXp());
         updateTaskHistory();
     }
+
 
 }

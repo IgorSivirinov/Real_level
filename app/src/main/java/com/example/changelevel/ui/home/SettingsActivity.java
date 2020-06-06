@@ -1,35 +1,25 @@
 package com.example.changelevel.ui.home;
 
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,10 +50,7 @@ import com.squareup.picasso.Picasso;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -74,13 +61,12 @@ public class SettingsActivity extends AppCompatActivity {
     private static RecyclerView recyclerView;
     public static View.OnClickListener myOnClickListener;
     private final int GALLERY_REQUEST = 2;
-    private final int CODE_IMG_GALLERY = 1;
     private final String  SAMPLE_CROPPED_IMG_NAME = "SampleCropImg";
-    private Uri photoURI;
     private ImageButton imageButtonBack;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<DataModelListAct> data;
     private RecyclerView.Adapter adapter;
+    TextView name;
 
     StorageReference riversRef;
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -135,7 +121,7 @@ public class SettingsActivity extends AppCompatActivity {
         imageButtonUser = findViewById(R.id.icon_user_activity_settings);
         imageButtonBack = findViewById(R.id.imageButton_back_toolbar_activity_settings);
         signOutButton = findViewById(R.id.b_signOut_activity_settings);
-        TextView name = findViewById(R.id.name_activity_settings);
+        name = findViewById(R.id.name_activity_settings);
         name.setText(user.getName());
         recyclerView=findViewById(R.id.recycler_view_act);
         recyclerView.setHasFixedSize(true);
@@ -149,8 +135,13 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        updateUser();
         updateIconUser();
+        name.setText(user.getName());
+
     }
+
+
 
     private void signOut() {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -384,6 +375,8 @@ public class SettingsActivity extends AppCompatActivity {
                 Toast.makeText(SettingsActivity.this, "Ошибка", Toast.LENGTH_LONG).show();
             }
         });
+        else imageButtonUser.setImageResource(R.drawable.ic_user_start);
+
     }
 
     private void newIconUser(final Uri uri){
@@ -419,7 +412,7 @@ public class SettingsActivity extends AppCompatActivity {
                             Toast.makeText(SettingsActivity.this, "Ошибка", Toast.LENGTH_LONG).show();
                         }
                     });
-//        }
+
     }
 
 
@@ -462,6 +455,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void updateUser(){
         SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
-        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+        user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""), User.class);
     }
 }

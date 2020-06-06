@@ -6,15 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".LoginAndRegistration.LoginActivity">
     <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="ВХОД"
-    android:textColor="@color/darkGray"
-    android:textSize="40sp"
-    android:layout_marginTop="90dp"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ВХОД"
+        android:textColor="@color/darkGray"
+        android:textSize="40sp"
+        android:layout_marginTop="90dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_email_activity_login"
@@ -62,7 +62,7 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Забылеи пароль?"
+        android:text="Забыли пароль?"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.79"
         app:layout_constraintStart_toStartOf="parent"
@@ -84,7 +84,7 @@
         android:id="@+id/button_go_to_registration"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="Регистация"
+        android:text="Регистрация"
         android:textColor="#000000"
         android:background="@drawable/ripple_null_background"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -1,5 +1,15 @@
 package com.example.changelevel.ui.community;
 
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -8,27 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskCompletedTapeFS;
 import com.example.changelevel.CustomAdapters.CustomAdapterHistory;
 import com.example.changelevel.CustomAdapters.CustomAdapterTaskCompleted;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTaskCompletedTape;
-import com.example.changelevel.ui.home.SettingsActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,7 +39,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class UserActivity extends AppCompatActivity{
-    private static final String TAG = "UserActivity";
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private Query historySort;
     private ProgressBar pbLoadingHistory;
@@ -203,7 +197,7 @@ public class UserActivity extends AppCompatActivity{
 
     private void updateUser(){
         SharedPreferences sharedPreferences = getSharedPreferences(user.APP_PREFERENCES_USER, MODE_PRIVATE);
-        iUser = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
+        iUser = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""), User.class);
     }
 
 

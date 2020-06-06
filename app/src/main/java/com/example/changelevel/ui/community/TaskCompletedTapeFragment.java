@@ -1,6 +1,10 @@
 package com.example.changelevel.ui.community;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -9,17 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-
-import com.example.changelevel.API.Firebase.Firestor.ClientObjects.User;
 import com.example.changelevel.API.Firebase.Firestor.TaskCompletedTapeFS;
-import com.example.changelevel.API.Firebase.Firestor.UserFS;
-import com.example.changelevel.API.Firebase.Firestor.UserTasksCompletedFS;
 import com.example.changelevel.CustomAdapters.CustomAdapterTaskCompleted;
-import com.example.changelevel.CustomAdapters.CustomAdapterUser;
 import com.example.changelevel.R;
 import com.example.changelevel.models.DataModels.DataModelTaskCompletedTape;
 import com.google.android.gms.tasks.OnSuccessListener;
