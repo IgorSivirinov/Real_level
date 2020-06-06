@@ -115,6 +115,7 @@ implements PopupMenu.OnMenuItemClickListener{
             }
         });
         if(userCreator.getUserAvatar()!=null)
+
             mStorageRef.child(userCreator.getUserAvatar()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
@@ -133,7 +134,7 @@ implements PopupMenu.OnMenuItemClickListener{
         iconUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openUserActivity();
+                openUserActivity(dataSet.get(position).getUser());
             }
         });
 
@@ -145,7 +146,7 @@ implements PopupMenu.OnMenuItemClickListener{
         user = gson.fromJson(sharedPreferences.getString(user.APP_PREFERENCES_USER,""),User.class);
     }
 
-    private void openUserActivity(){
+    private void openUserActivity(User user){
         Intent intent = new Intent(context, UserActivity.class);
         intent.putExtra("user", gson.toJson(user));
         context.startActivity(intent);
