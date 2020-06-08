@@ -49,7 +49,6 @@ implements PopupMenu.OnMenuItemClickListener{
     private int mPosition;
     private int mMenuPosition;
     private User user;
-    private User userCreator;
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private Gson gson = new Gson();
     private boolean userComplained;
@@ -77,8 +76,7 @@ implements PopupMenu.OnMenuItemClickListener{
 
         mPosition = position;
         updateUser();
-        userCreator = dataSet.get(position).getUser();
-
+        User userCreator = dataSet.get(position).getUser();
 
         nameTask = holder.nameTask;
         nameUser = holder.nameUser;
